@@ -26,7 +26,13 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       yypushback(moveBackCount);
   }
   public IElementType jclBegin(int state, IElementType elementType) {
-      if (72 < yycolumn+yylength() && elementType != JclTypes.SEQUENCE_NUMBERS && yycolumn < 80 && elementType != TokenType.WHITE_SPACE) {
+      if (
+              72 < yycolumn+yylength()
+              && elementType != JclTypes.SEQUENCE_NUMBERS
+              && elementType != JclTypes.COMMENT
+              && yycolumn < 80
+              && elementType != TokenType.WHITE_SPACE
+              && elementType != JclTypes.CRLF) {
           moveBack(72);
           if (yycolumn!=72) {
             prevState = state;
@@ -53,14 +59,14 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
         }
         if (movedBack) {
           movedBack = false;
-          yybegin(prevState);
+          yybegin(state);
           return TokenType.BAD_CHARACTER;
         }
       }
 
       prevState = state;
       yybegin(state);
-      return elementType;
+      return elementType == JclTypes.CRLF ? TokenType.WHITE_SPACE : elementType;
   }
 %}
 
@@ -71,7 +77,7 @@ MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\ \n\f\t\/\\]{1,7}
 NOT_SPACE=[^\ \n\f\t\\,]+
 NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=]+
 OPERATOR=(JOB|EXEC|DD)
-END_OF_LINE_COMMENT=\/\/\*.*
+END_OF_LINE_COMMENT=\/\/\*[^\n\r\R]*
 LINE_START=\/\/
 TEMPLATE_PARAM=(\{\{.+\}\})
 STRING=\'.*\'
@@ -100,7 +106,7 @@ SEQUENCE_NUMBER=[^\n\r]{1,8}
 
 <YYINITIAL> {LINE_START}                                    { yybegin(LINE_STARTED); return JclTypes.LINE_START; }
 
-<YYINITIAL> {END_OF_LINE_COMMENT}                           { yybegin(WAITING_SN_OR_NEW_LINE); return JclTypes.COMMENT; }
+<YYINITIAL> {END_OF_LINE_COMMENT}                           { return jclBegin(WAITING_SN_OR_NEW_LINE, JclTypes.COMMENT); }
 
 <LINE_STARTED> {MF_IDENTIFIER_NAME}                         { yybegin(WAITING_OPERATOR); return JclTypes.OPERATOR_NAME; }
 
@@ -116,9 +122,13 @@ SEQUENCE_NUMBER=[^\n\r]{1,8}
 
 <WAITING_SPACE_PARAMS> {SPACE}                              { return jclBegin(WAITING_PARAM, TokenType.WHITE_SPACE); }
 
-<WAITING_NEW_LINE> {SPACE}*{CRLF}                           { return jclBegin(YYINITIAL, TokenType.WHITE_SPACE); }
+<WAITING_NEW_LINE> {SPACE}+{CRLF}                           { return jclBegin(YYINITIAL, TokenType.WHITE_SPACE); }
 
-<WAITING_LINE_CONTINUES> {SPACE}*{CRLF}                     { return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); }
+<WAITING_LINE_CONTINUES> {SPACE}+{CRLF}                     { return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); }
+
+<WAITING_NEW_LINE> {CRLF}                                   { return jclBegin(YYINITIAL, JclTypes.CRLF); }
+
+<WAITING_LINE_CONTINUES> {CRLF}                             { return jclBegin(LINE_CONTINUED, JclTypes.CRLF); }
 
 
 <WAITING_PARAM> {SPACE}                                     { return jclBegin(WAITING_LINE_CONTINUES, TokenType.WHITE_SPACE); }
