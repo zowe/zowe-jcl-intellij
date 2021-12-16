@@ -21,19 +21,18 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   public int yycolumn = 0;
   public int prevState = 0;
   public boolean movedBack = false;
-  public void moveBack(int count) {
-      int moveBackCount = Math.min(yycolumn+yylength()-count, yylength());
-      yypushback(moveBackCount);
+  public void moveBackTo(int position) {
+      yypushback(Math.min(yycolumn+yylength()-position, yylength()));
+  }
+  public boolean isCommentOrWhiteSpace (IElementType elementType) {
+      return elementType == JclTypes.SEQUENCE_NUMBERS
+       || elementType == JclTypes.COMMENT
+       || elementType == TokenType.WHITE_SPACE
+       || elementType == JclTypes.CRLF;
   }
   public IElementType jclBegin(int state, IElementType elementType) {
-      if (
-              72 < yycolumn+yylength()
-              && elementType != JclTypes.SEQUENCE_NUMBERS
-              && elementType != JclTypes.COMMENT
-              && yycolumn < 80
-              && elementType != TokenType.WHITE_SPACE
-              && elementType != JclTypes.CRLF) {
-          moveBack(72);
+      if (72 < yycolumn+yylength() && yycolumn < 80 && !isCommentOrWhiteSpace(elementType)) {
+          moveBackTo(72);
           if (yycolumn!=72) {
             prevState = state;
           }
@@ -47,12 +46,9 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           return TokenType.BAD_CHARACTER;
       }
 
-      if (elementType == JclTypes.SEQUENCE_NUMBERS) {
-          state = prevState;
-      }
       if (elementType != JclTypes.CRLF) {
         if (yycolumn +yylength() > 80 && !movedBack) {
-          moveBack(80);
+          moveBackTo(80);
           movedBack = true;
           yybegin(prevState);
           return elementType;
