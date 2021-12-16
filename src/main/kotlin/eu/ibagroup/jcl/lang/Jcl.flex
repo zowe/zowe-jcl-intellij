@@ -70,14 +70,14 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   }
 %}
 
-CRLF=[\n\r\R]
+CRLF=[\n\r]
 WHITE_SPACE=[\ \n\t\f]+
 SPACE=[\ \t\f]+
 MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\ \n\f\t\/\\]{1,7}
 NOT_SPACE=[^\ \n\f\t\\,]+
 NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=]+
 OPERATOR=(JOB|EXEC|DD)
-END_OF_LINE_COMMENT=\/\/\*[^\n\r\R]*
+END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
 LINE_START=\/\/
 TEMPLATE_PARAM=(\{\{.+\}\})
 STRING=\'.*\'
