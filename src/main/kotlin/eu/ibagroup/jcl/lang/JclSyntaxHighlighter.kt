@@ -35,6 +35,11 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     public final val PARAM_VALUE =
       createTextAttributesKey("JCL_PARAM_VALUE", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
 
+    public final val INSTREAM_TEXT =
+      createTextAttributesKey("JCL_INSTREAM_TEXT", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE)
+
+    public final val SEQUENCE_NUMBERS =
+      createTextAttributesKey("JCL_SEQUENCE_NUMBERS", DefaultLanguageHighlighterColors.METADATA)
 
     private final val COMMENT_KEYS = arrayOf(COMMENT)
     private final val OPERATOR_KEYS = arrayOf(OPERATOR)
@@ -42,7 +47,9 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     private final val OPERATOR_NAME_KEYS = arrayOf(OPERATOR_NAME)
     private final val STRING_KEYS = arrayOf(STRING)
     private final val PARAM_NAME_KEYS = arrayOf(PARAM_NAME)
-    public final val PARAM_VALUE_KEYS = arrayOf(PARAM_VALUE)
+    private final val PARAM_VALUE_KEYS = arrayOf(PARAM_VALUE)
+    private final val SEQUENCE_NUMBERS_KEYS = arrayOf(SEQUENCE_NUMBERS)
+    private final val INSTREAM_TEXT_KEYS = arrayOf(INSTREAM_TEXT)
     private final val EMPTY_KEYS = arrayOf<TextAttributesKey>()
   }
 
@@ -64,7 +71,7 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     if (tokenType == JclTypes.STRING) {
       return STRING_KEYS
     }
-    if (tokenType == JclTypes.PARAM_KEY) {
+    if (tokenType == JclTypes.PARAM_KEY || tokenType == JclTypes.INSTREAM_START || tokenType == JclTypes.INSTREAM_END) {
       return PARAM_NAME_KEYS
     }
     if (tokenType == JclTypes.PARAM_VALUE) {
@@ -72,6 +79,9 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     }
     if (tokenType == JclTypes.SEQUENCE_NUMBERS) {
       return COMMENT_KEYS
+    }
+    if (tokenType == JclTypes.INSTREAM_TEXT) {
+      return STRING_KEYS
     }
     return EMPTY_KEYS
   }
