@@ -3,7 +3,7 @@ package eu.ibagroup.jcl.lang;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import eu.ibagroup.jcl.lang.psi.JclTypes;
-import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
+import com.intellij.psi.TokenType;
 
 %%
 
@@ -71,7 +71,7 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   }
   public IElementType startParams(boolean isInstreamParams, IElementType elementType) {
       instreamParamStarted = isInstreamParams;
-      return jclBegin(WAITING_SPACE_PARAMS, elementType);
+      return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, elementType);
   }
   public IElementType endParams(IElementType elementType) {
       if (instreamParamStarted) {
@@ -92,13 +92,10 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
 %}
 
 CRLF=\R
-WHITE_SPACE=[\ \n\t\f]+
 SPACE=[\ \t\f]+
-MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\ \n\f\t\/\\]{1,7}
+MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\]{1,7}
 NOT_SPACE=[^\ \n\f\t\\,]+
-NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=]+
-OPERATOR=(JOB|EXEC)
-DD_OPERATOR=DD
+NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\*]+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
 INSTREAM_SIMPLE_LINE=\/|(\/[^\/\n\r][^\n\r]{0,70})|([^\/][^\n\r]{0,71})
 LINE_START=\/\/
@@ -155,15 +152,13 @@ INSTREAM_END=\/\*
 
 <INSTREAM_LINE_CONTINUED> {END_OF_LINE_COMMENT}             { return jclBegin(WAITING_INSTREAM_CONTINUES, JclTypes.COMMENT); }
 
-//<INSTREAM_LINE_CONTINUED> {LINE_START}                      { return jclBegin(WAITING_DD, ) }
-//<INSTREAM_LINE_CONTINUED> {LINE_START}                      { return jclBegin(WAITING_INSTREAM_OPERATOR, JclTypes.LINE_START); }
 <INSTREAM_LINE_CONTINUED> {INSTREAM_END}                    { return jclBegin(WAITING_NEW_LINE, JclTypes.INSTREAM_END); }
 
 <INSTREAM_LINE_CONTINUED> {LINE_START}                      { return jclBegin(WAITING_INSTREAM_OPERATOR_SPACE, JclTypes.LINE_START); }
 
 <WAITING_INSTREAM_OPERATOR_SPACE> {SPACE}                   { return jclBegin(WAITING_INSTREAM_OPERATOR, TokenType.WHITE_SPACE); }
 
-<WAITING_INSTREAM_OPERATOR> {DD_OPERATOR}                   { return startParams(true, JclTypes.OPERATOR); }
+<WAITING_INSTREAM_OPERATOR> {MF_IDENTIFIER_NAME}            { return startParams(true, JclTypes.OPERATOR); }
 
 <INSTREAM_LINE_CONTINUED> {INSTREAM_SIMPLE_LINE}            { return jclBegin(WAITING_INSTREAM_CONTINUES, JclTypes.INSTREAM_TEXT); }
 
@@ -171,9 +166,9 @@ INSTREAM_END=\/\*
 
 <WAITING_OPERATOR> {SPACE}                                  { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
 
-<WAITING_OPERATOR> {OPERATOR}                               { return startParams(false, JclTypes.OPERATOR); }
+<WAITING_OPERATOR> {MF_IDENTIFIER_NAME}                     { return startParams(false, JclTypes.OPERATOR); }
 
-<WAITING_OPERATOR> {DD_OPERATOR}                            { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
+//<WAITING_OPERATOR> {DD_OPERATOR}                            { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
 
 <WAITING_SPACE_PARAMS> {SPACE}                              { return jclBegin(WAITING_PARAM, TokenType.WHITE_SPACE); }
 
@@ -194,7 +189,7 @@ INSTREAM_END=\/\*
 
 
 
-<WAITING_PARAM_OR_INSTREAM> {INSTREAM_START}                { return jclBegin(WAITING_INSTREAM, JclTypes.INSTREAM_START); }
+<WAITING_PARAM_OR_INSTREAM> {INSTREAM_START}                { instreamParamStarted = true; return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START); }
 
 <WAITING_INSTREAM> {SPACE}                                  { return jclBegin(WAITING_INSTREAM_CONTINUES, TokenType.WHITE_SPACE); }
 
@@ -247,6 +242,13 @@ INSTREAM_END=\/\*
 <WAITING_INSTREAM_CONTINUES> {SEQUENCE_NUMBER}              { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
 
 
-{CRLF}+                                                     { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+{CRLF}+                                                     {
+          if (instreamParamStarted) {
+              yybegin(INSTREAM_LINE_CONTINUED);
+          } else {
+              yybegin(YYINITIAL);
+          }
+          return TokenType.WHITE_SPACE;
+      }
 
 [^]                                                         { return TokenType.BAD_CHARACTER; }
