@@ -25,6 +25,8 @@
 
         <lang.syntaxHighlighterFactory language="JCL"
                                        implementationClass="eu.ibagroup.jcl.lang.JclSyntaxHighlighterFactory"/>
+
+        <colorSettingsPage implementation="eu.ibagroup.jcl.lang.JclColorSettingsPage"/>
     </extensions>
 
     <actions>
