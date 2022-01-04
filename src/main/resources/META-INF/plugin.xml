@@ -27,6 +27,11 @@
                                        implementationClass="eu.ibagroup.jcl.lang.JclSyntaxHighlighterFactory"/>
 
         <colorSettingsPage implementation="eu.ibagroup.jcl.lang.JclColorSettingsPage"/>
+
+        <annotator language="JCL" implementationClass="eu.ibagroup.jcl.lang.JclAnnotator"/>
+
+        <completion.contributor language="JCL" implementationClass="eu.ibagroup.jcl.lang.JclCompletionContributor"/>
+
     </extensions>
 
     <actions>
