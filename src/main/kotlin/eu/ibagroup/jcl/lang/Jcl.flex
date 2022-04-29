@@ -165,7 +165,6 @@ INSTREAM_END=\/\*
 <INSTREAM_LINE_CONTINUED> {INSTREAM_SIMPLE_LINE}            { return jclBegin(WAITING_INSTREAM_CONTINUES, JclTypes.INSTREAM_TEXT); }
 
 
-
 <WAITING_OPERATOR> {SPACE}                                  { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
 
 <WAITING_OPERATOR> {MF_IDENTIFIER_NAME}                     { return startParams(false, JclTypes.OPERATOR); }
@@ -180,7 +179,7 @@ INSTREAM_END=\/\*
 
 <WAITING_LINE_CONTINUES> {SPACE}+{CRLF}                     { return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); }
 
-<WAITING_INSTREAM_CONTINUES> {CRLF}                         { return jclBegin(INSTREAM_LINE_CONTINUED, JclTypes.CRLF); }
+<WAITING_INSTREAM_CONTINUES> {CRLF}+                        { return jclBegin(INSTREAM_LINE_CONTINUED, JclTypes.CRLF); }
 
 <WAITING_INSTREAM_CONTINUES> {SPACE}{CRLF}                  { return jclBegin(INSTREAM_LINE_CONTINUED, TokenType.WHITE_SPACE); }
 
