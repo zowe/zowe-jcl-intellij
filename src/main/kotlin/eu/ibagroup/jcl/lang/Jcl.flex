@@ -43,9 +43,6 @@ import com.intellij.psi.TokenType;
             prevState = state;
           }
           yybegin(WAITING_SN);
-//          if (yycolumn == 72) {
-//              return TokenType.WHITE_SPACE;
-//          }
           return elementType;
       }
       if (yycolumn < 72 && elementType == JclTypes.SEQUENCE_NUMBERS) {
