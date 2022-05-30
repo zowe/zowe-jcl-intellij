@@ -91,13 +91,37 @@ import com.intellij.psi.TokenType;
           }
       }
   }
+  public IElementType processParamDelim () {
+      if (yycolumn != 72) {
+          firstParamInitialized = true;
+          return jclBegin(WAITING_PARAM, JclTypes.PARAM_DELIM);
+      } else {
+          moveBackTo(72);
+          prevState = WAITING_PARAM_DELIM;
+          yybegin(WAITING_SN);
+          return TokenType.WHITE_SPACE;
+      }
+  }
+  public IElementType processSimpleParam () {
+      if ((yytext().toString().equals("*") && yycolumn <= 71) || (yytext().toString().startsWith("*") && yycolumn == 71)) {
+          instreamParamStarted = true;
+          return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START);
+      } else if (yycolumn <= 71) {
+          return jclBegin(WAITING_EQUALS_OR_DELIM, JclTypes.PARAM_KEY);
+      } else {
+          moveBackTo(72);
+          prevState = WAITING_PARAM;
+          yybegin(WAITING_SN);
+          return TokenType.WHITE_SPACE;
+      }
+  }
 %}
 
 CRLF=\R
 SPACE=[\ \t\f]+
 MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\]{1,7}
 NOT_SPACE=[^\ \n\f\t\\,]+
-NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\*]+
+NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=]+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
 INSTREAM_SIMPLE_LINE=\/|(\/[^\/\n\r][^\n\r]{0,70})|([^\/][^\n\r]{0,71})
 LINE_START=\/\/
@@ -108,7 +132,7 @@ TUPLE=\( (.+ | \(.+ (,.+)\)) (,(.+ | \(.+ (,.+)\))) \)
 EQUALS==
 PARAM_DELIM=,
 SEQUENCE_NUMBER=[^\n\r]{1,8}
-SN_STARTS_WITH_NOT_SPACE=[^\n\r\t\ \f]{1}[^\n\r]{1,7}
+SN_STARTS_WITH_NOT_SPACE=[^\n\r\t\ \f]{1}[^\n\r]{0,7}
 INSTREAM_START=\*
 INSTREAM_END=\/\*
 
@@ -175,7 +199,7 @@ INSTREAM_END=\/\*
 
 <WAITING_SPACE_PARAMS> {SPACE}                              { return jclBegin(WAITING_PARAM, TokenType.WHITE_SPACE); }
 
-<WAITING_SPACE_PARAMS_OR_INSTREAM> {SPACE}                  { return jclBegin(WAITING_PARAM_OR_INSTREAM, TokenType.WHITE_SPACE); }
+<WAITING_SPACE_PARAMS_OR_INSTREAM> {SPACE}                  { return jclBegin(WAITING_PARAM, TokenType.WHITE_SPACE); }
 
 <WAITING_SPACE_PARAMS_OR_INSTREAM> {SPACE}*{CRLF}           { if (instreamParamStarted) return jclBegin(INSTREAM_LINE_CONTINUED, TokenType.WHITE_SPACE); else return jclBegin(YYINITIAL, TokenType.WHITE_SPACE); }
 
@@ -194,7 +218,8 @@ INSTREAM_END=\/\*
 
 
 
-<WAITING_PARAM_OR_INSTREAM> {INSTREAM_START}                { instreamParamStarted = true; return jclBegin(WAITING_PARAM_DELIM_AFTER_INSTREAM_START, JclTypes.INSTREAM_START); }
+
+//<WAITING_PARAM_OR_INSTREAM> {INSTREAM_START}                { instreamParamStarted = true; return jclBegin(WAITING_PARAM_DELIM_AFTER_INSTREAM_START, JclTypes.INSTREAM_START); }
 
 <WAITING_INSTREAM> {SPACE}                                  { return jclBegin(WAITING_INSTREAM_CONTINUES, TokenType.WHITE_SPACE); }
 
@@ -202,18 +227,17 @@ INSTREAM_END=\/\*
 
 
 
-<WAITING_PARAM, WAITING_PARAM_OR_INSTREAM> {SPACE}          { return jclBegin(WAITING_LINE_CONTINUES, TokenType.WHITE_SPACE); }
+<WAITING_PARAM> {SPACE}                                     { return jclBegin(WAITING_LINE_CONTINUES, TokenType.WHITE_SPACE); }
 
-<WAITING_PARAM, WAITING_PARAM_OR_INSTREAM> {SPACE}*{CRLF}   { if (firstParamInitialized) return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); else return jclBegin(YYINITIAL, TokenType.WHITE_SPACE); }
+<WAITING_PARAM> {SPACE}*{CRLF}                              { if (firstParamInitialized) return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); else return jclBegin(YYINITIAL, TokenType.WHITE_SPACE); }
 
-<WAITING_PARAM, WAITING_PARAM_OR_INSTREAM> {STRING}         { return jclBegin(WAITING_PARAM_DELIM, JclTypes.STRING); }
+<WAITING_PARAM> {STRING}                                    { return jclBegin(WAITING_PARAM_DELIM, JclTypes.STRING); }
 
-<WAITING_PARAM, WAITING_PARAM_OR_INSTREAM> {TUPLE}          { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TUPLE); }
+<WAITING_PARAM> {TUPLE}                                     { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TUPLE); }
 
-<WAITING_PARAM, WAITING_PARAM_OR_INSTREAM> {TEMPLATE_PARAM} { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TEMPLATE_PARAM); }
+<WAITING_PARAM> {TEMPLATE_PARAM}                            { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TEMPLATE_PARAM); }
 
-<WAITING_PARAM,
- WAITING_PARAM_OR_INSTREAM> {NOT_EQUALS_NOT_SPACE}          { return jclBegin(WAITING_EQUALS_OR_DELIM, JclTypes.PARAM_KEY); }
+<WAITING_PARAM> {NOT_EQUALS_NOT_SPACE}                      { return processSimpleParam(); }
 
 <WAITING_EQUALS_OR_DELIM> {EQUALS}                          { return jclBegin(WAITING_PARAM_VALUE, JclTypes.PARAM_EQUALS); }
 
@@ -224,7 +248,7 @@ INSTREAM_END=\/\*
 <WAITING_PARAM_VALUE> {NOT_SPACE}                           { return jclBegin(WAITING_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
 
 <WAITING_PARAM_DELIM,
- WAITING_PARAM_DELIM_AFTER_INSTREAM_START> {PARAM_DELIM}    { firstParamInitialized = true; return jclBegin(WAITING_PARAM, JclTypes.PARAM_DELIM); }
+ WAITING_PARAM_DELIM_AFTER_INSTREAM_START> {PARAM_DELIM}    { return processParamDelim(); }
 
 <WAITING_PARAM_DELIM,
  WAITING_PARAM_DELIM_AFTER_INSTREAM_START> {SPACE}          { return endParams(TokenType.WHITE_SPACE); }
@@ -233,11 +257,10 @@ INSTREAM_END=\/\*
  WAITING_PARAM_DELIM_AFTER_INSTREAM_START> {CRLF}           { return endParams(JclTypes.CRLF); }
 
 // TODO: think about how to rework.
-<WAITING_PARAM_DELIM_AFTER_INSTREAM_START>
-                    {SN_STARTS_WITH_NOT_SPACE}              { return endParams(JclTypes.SEQUENCE_NUMBERS); }
+//<WAITING_PARAM_DELIM> {SN_STARTS_WITH_NOT_SPACE}            { return endParams(JclTypes.SEQUENCE_NUMBERS); }
 
 
-<WAITING_EQUALS_OR_DELIM> {PARAM_DELIM}                     { firstParamInitialized = true; return jclBegin(WAITING_PARAM, JclTypes.PARAM_DELIM); }
+<WAITING_EQUALS_OR_DELIM> {PARAM_DELIM}                     { return processParamDelim(); }
 
 <WAITING_EQUALS_OR_DELIM> {SPACE}                           { return endParams(TokenType.WHITE_SPACE); }
 
