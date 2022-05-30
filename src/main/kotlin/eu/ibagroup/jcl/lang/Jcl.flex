@@ -119,7 +119,7 @@ import com.intellij.psi.TokenType;
 
 CRLF=\R
 SPACE=[\ \t\f]+
-MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\]{1,7}
+MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\\.]{1,7}
 NOT_SPACE=[^\ \n\f\t\\,]+
 NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=]+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
@@ -134,11 +134,14 @@ PARAM_DELIM=,
 SEQUENCE_NUMBER=[^\n\r]{1,8}
 SN_STARTS_WITH_NOT_SPACE=[^\n\r\t\ \f]{1}[^\n\r]{0,7}
 INSTREAM_START=\*
+OPERATOR_NAME_DELIM=\.
 INSTREAM_END=\/\*
 
 
 %state LINE_STARTED
 %state WAITING_OPERATOR
+%state WAITING_OPERATOR_OR_OVERRIDE_NAME
+%state WAITING_OVERRIDE_NAME
 %state WAITING_INSTREAM_OPERATOR
 %state WAITING_INSTREAM_OPERATOR_SPACE
 
@@ -169,8 +172,15 @@ INSTREAM_END=\/\*
 
 <YYINITIAL> {END_OF_LINE_COMMENT}                           { return jclBegin(WAITING_SN_OR_NEW_LINE, JclTypes.COMMENT); }
 
-<LINE_STARTED,
- WAITING_INSTREAM_OPERATOR_SPACE> {MF_IDENTIFIER_NAME}      { return jclBegin(WAITING_OPERATOR, JclTypes.OPERATOR_NAME); }
+<LINE_STARTED> {MF_IDENTIFIER_NAME}                         { return jclBegin(WAITING_OPERATOR_OR_OVERRIDE_NAME, JclTypes.OPERATOR_NAME); }
+
+<WAITING_OPERATOR_OR_OVERRIDE_NAME> {OPERATOR_NAME_DELIM}   { return jclBegin(WAITING_OVERRIDE_NAME, JclTypes.OPERATOR_NAME_DELIM); }
+
+<WAITING_OVERRIDE_NAME> {MF_IDENTIFIER_NAME}                { return jclBegin(WAITING_OPERATOR, JclTypes.OPERATOR_OVERRIDE_NAME); }
+
+<WAITING_OVERRIDE_NAME> {SPACE}                             { return jclBegin(WAITING_OPERATOR, TokenType.BAD_CHARACTER); }
+
+<WAITING_INSTREAM_OPERATOR_SPACE> {MF_IDENTIFIER_NAME}      { return jclBegin(WAITING_OPERATOR, JclTypes.OPERATOR_NAME); }
 
 <LINE_STARTED> {SPACE}                                      { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
 
@@ -191,7 +201,8 @@ INSTREAM_END=\/\*
 <INSTREAM_LINE_CONTINUED> {INSTREAM_SIMPLE_LINE}            { return jclBegin(WAITING_INSTREAM_CONTINUES, JclTypes.INSTREAM_TEXT); }
 
 
-<WAITING_OPERATOR> {SPACE}                                  { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
+<WAITING_OPERATOR,
+    WAITING_OPERATOR_OR_OVERRIDE_NAME> {SPACE}              { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
 
 <WAITING_OPERATOR> {MF_IDENTIFIER_NAME}                     { return startParams(false, JclTypes.OPERATOR); }
 

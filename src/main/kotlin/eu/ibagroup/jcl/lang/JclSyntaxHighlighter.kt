@@ -68,6 +68,9 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     if (tokenType == JclTypes.OPERATOR_NAME) {
       return OPERATOR_NAME_KEYS
     }
+    if (tokenType == JclTypes.OPERATOR_OVERRIDE_NAME) {
+      return OPERATOR_NAME_KEYS
+    }
     if (tokenType == JclTypes.STRING) {
       return STRING_KEYS
     }
