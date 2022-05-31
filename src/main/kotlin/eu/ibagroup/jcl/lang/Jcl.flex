@@ -23,6 +23,7 @@ import com.intellij.psi.TokenType;
   public boolean movedBack = false;
   public boolean instreamParamStarted = false;
   public boolean firstParamInitialized = false;
+  public int tupleInnerCounter = 0;
   public void moveBackTo(int position) {
       yypushback(Math.min(yycolumn+yylength()-position, yylength()));
   }
@@ -115,14 +116,31 @@ import com.intellij.psi.TokenType;
           return TokenType.WHITE_SPACE;
       }
   }
+  public IElementType processStringEnd () {
+      if (tupleInnerCounter <= 0) {
+          tupleInnerCounter = 0;
+          return jclBegin(WAITING_PARAM_DELIM, JclTypes.STRING_BRACKET);
+      } else {
+          return jclBegin(WAITING_TUPLE_PARAM_DELIM, JclTypes.STRING_BRACKET);
+      }
+  }
+  public IElementType processTupleEnd () {
+      --tupleInnerCounter;
+      if (tupleInnerCounter <= 0) {
+          tupleInnerCounter = 0;
+          return jclBegin(WAITING_PARAM_DELIM, JclTypes.TUPLE_END);
+      } else {
+          return jclBegin(WAITING_TUPLE_PARAM_DELIM, JclTypes.TUPLE_END);
+      }
+  }
 %}
 
 CRLF=\R
 SPACE=[\ \t\f]+
 STRING_CONTENT=[^\n\r\']*
 MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\\.]{1,7}
-NOT_SPACE=[^\ \n\f\t\\,\']+
-NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\']+
+NOT_SPACE=[^\ \n\f\t\\,\'\(\)]+
+NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\'\(\)]+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
 INSTREAM_SIMPLE_LINE=\/|(\/[^\/\n\r][^\n\r]{0,70})|([^\/][^\n\r]{0,71})
 LINE_START=\/\/
@@ -130,7 +148,9 @@ TEMPLATE_PARAM=(\{\{.+\}\})
 STRING=\'.*\'
 STRING_BRACKET=\'
 //tuple inside tuple ((1,2,3),123)
-TUPLE=\( (.+ | \(.+ (,.+)\)) (,(.+ | \(.+ (,.+)\))) \)
+//TUPLE=\( (.+ | \(.+ (,.+)\)) (,(.+ | \(.+ (,.+)\))) \)
+TUPLE_START=\(
+TUPLE_END=\)
 EQUALS==
 PARAM_DELIM=,
 SEQUENCE_NUMBER=[^\n\r]{1,8}
@@ -154,6 +174,12 @@ INSTREAM_END=\/\*
 %state WAITING_STRING_CONTENT
 %state WAITING_STRING_CONTENT_OR_STRING_END
 %state WAITING_STRING_END_OR_CONTINUES
+%state WAITING_TUPLE_PARAM
+%state WAITING_TUPLE_PARAM_DELIM
+%state WAITING_TUPLE_PARAM_CONTINUES
+%state WAITING_TUPLE_PARAM_NEW_LINE
+%state WAITING_TUPLE_PARAM_NEW_LINE_OR_SN
+%state WAITING_SPACE_BEFORE_TUPLE_PARAM
 %state STRING_LINE_CONTINUED
 %state WAITING_EQUALS_OR_DELIM
 %state WAITING_PARAM_VALUE
@@ -186,7 +212,7 @@ INSTREAM_END=\/\*
 
 <WAITING_OVERRIDE_NAME> {SPACE}                             { return jclBegin(WAITING_OPERATOR, TokenType.BAD_CHARACTER); }
 
-<WAITING_INSTREAM_OPERATOR_SPACE> {MF_IDENTIFIER_NAME}      { return jclBegin(WAITING_OPERATOR, JclTypes.OPERATOR_NAME); }
+<WAITING_INSTREAM_OPERATOR_SPACE> {MF_IDENTIFIER_NAME}      { return jclBegin(WAITING_OPERATOR_OR_OVERRIDE_NAME, JclTypes.OPERATOR_NAME); }
 
 <LINE_STARTED> {SPACE}                                      { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
 
@@ -250,20 +276,44 @@ INSTREAM_END=\/\*
 
 
 
-<WAITING_PARAM> {STRING_BRACKET}                            { return jclBegin(WAITING_STRING_CONTENT, JclTypes.STRING_BRACKET); }
+<WAITING_PARAM> {STRING_BRACKET}                            { return jclBegin(WAITING_STRING_CONTENT_OR_STRING_END, JclTypes.STRING_BRACKET); }
 
 <WAITING_STRING_CONTENT,
  WAITING_STRING_CONTENT_OR_STRING_END> {STRING_CONTENT}     { return jclBegin(WAITING_STRING_END_OR_CONTINUES, JclTypes.STRING_CONTENT); }
 
 <WAITING_STRING_END_OR_CONTINUES,
- WAITING_STRING_CONTENT_OR_STRING_END> {STRING_BRACKET}     { return jclBegin(WAITING_PARAM_DELIM, JclTypes.STRING_BRACKET); }
+ WAITING_STRING_CONTENT_OR_STRING_END> {STRING_BRACKET}     { return processStringEnd(); }
 
 <WAITING_STRING_END_OR_CONTINUES> {CRLF}                    { return jclBegin(STRING_LINE_CONTINUED, TokenType.WHITE_SPACE); }
 
 <STRING_LINE_CONTINUED> {LINE_START}                        { return jclBegin(WAITING_STRING_CONTENT_OR_STRING_END, JclTypes.LINE_START); }
 
 
-<WAITING_PARAM> {TUPLE}                                     { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TUPLE); }
+
+<WAITING_PARAM,
+ WAITING_TUPLE_PARAM> {TUPLE_START}                         { ++tupleInnerCounter; return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_START); }
+
+<WAITING_TUPLE_PARAM> {STRING_BRACKET}                      { return jclBegin(WAITING_STRING_CONTENT_OR_STRING_END, JclTypes.STRING_BRACKET); }
+
+<WAITING_TUPLE_PARAM> {NOT_EQUALS_NOT_SPACE}                { return jclBegin(WAITING_TUPLE_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
+
+<WAITING_TUPLE_PARAM_DELIM> {PARAM_DELIM}                   { return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_PARAM_DELIM); }
+
+<WAITING_TUPLE_PARAM_DELIM> {TUPLE_END}                     { return processTupleEnd(); }
+
+<WAITING_TUPLE_PARAM> {SPACE}                               { return jclBegin(WAITING_LINE_CONTINUES, TokenType.WHITE_SPACE); }
+
+<WAITING_TUPLE_PARAM,
+ WAITING_TUPLE_PARAM_NEW_LINE> {CRLF}                       { return jclBegin(WAITING_TUPLE_PARAM_CONTINUES, TokenType.WHITE_SPACE); }
+
+<WAITING_TUPLE_PARAM_NEW_LINE_OR_SN> {SEQUENCE_NUMBER}      { return jclBegin(WAITING_TUPLE_PARAM_NEW_LINE, JclTypes.SEQUENCE_NUMBERS); }
+
+<WAITING_TUPLE_PARAM_CONTINUES> {LINE_START}                { return jclBegin(WAITING_SPACE_BEFORE_TUPLE_PARAM, JclTypes.LINE_START); }
+
+<WAITING_SPACE_BEFORE_TUPLE_PARAM> {SPACE}                  { return jclBegin(WAITING_TUPLE_PARAM, TokenType.WHITE_SPACE); }
+
+
+
 
 <WAITING_PARAM> {TEMPLATE_PARAM}                            { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TEMPLATE_PARAM); }
 
@@ -273,7 +323,7 @@ INSTREAM_END=\/\*
 
 <WAITING_PARAM_VALUE> {STRING_BRACKET}                      { return jclBegin(WAITING_STRING_CONTENT, JclTypes.STRING_BRACKET); }
 
-<WAITING_PARAM_VALUE> {TUPLE}                               { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TUPLE); }
+<WAITING_PARAM_VALUE> {TUPLE_START}                         { ++tupleInnerCounter; return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_START); }
 
 <WAITING_PARAM_VALUE> {NOT_SPACE}                           { return jclBegin(WAITING_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
 
