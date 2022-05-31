@@ -119,14 +119,16 @@ import com.intellij.psi.TokenType;
 
 CRLF=\R
 SPACE=[\ \t\f]+
+STRING_CONTENT=[^\n\r\']*
 MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\\.]{1,7}
-NOT_SPACE=[^\ \n\f\t\\,]+
-NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=]+
+NOT_SPACE=[^\ \n\f\t\\,\']+
+NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\']+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
 INSTREAM_SIMPLE_LINE=\/|(\/[^\/\n\r][^\n\r]{0,70})|([^\/][^\n\r]{0,71})
 LINE_START=\/\/
 TEMPLATE_PARAM=(\{\{.+\}\})
 STRING=\'.*\'
+STRING_BRACKET=\'
 //tuple inside tuple ((1,2,3),123)
 TUPLE=\( (.+ | \(.+ (,.+)\)) (,(.+ | \(.+ (,.+)\))) \)
 EQUALS==
@@ -149,6 +151,10 @@ INSTREAM_END=\/\*
 %state WAITING_SPACE_PARAMS_OR_INSTREAM
 %state WAITING_PARAM
 %state WAITING_PARAM_OR_INSTREAM
+%state WAITING_STRING_CONTENT
+%state WAITING_STRING_CONTENT_OR_STRING_END
+%state WAITING_STRING_END_OR_CONTINUES
+%state STRING_LINE_CONTINUED
 %state WAITING_EQUALS_OR_DELIM
 %state WAITING_PARAM_VALUE
 %state WAITING_PARAM_DELIM
@@ -242,7 +248,20 @@ INSTREAM_END=\/\*
 
 <WAITING_PARAM> {SPACE}*{CRLF}                              { if (firstParamInitialized) return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); else return jclBegin(YYINITIAL, TokenType.WHITE_SPACE); }
 
-<WAITING_PARAM> {STRING}                                    { return jclBegin(WAITING_PARAM_DELIM, JclTypes.STRING); }
+
+
+<WAITING_PARAM> {STRING_BRACKET}                            { return jclBegin(WAITING_STRING_CONTENT, JclTypes.STRING_BRACKET); }
+
+<WAITING_STRING_CONTENT,
+ WAITING_STRING_CONTENT_OR_STRING_END> {STRING_CONTENT}     { return jclBegin(WAITING_STRING_END_OR_CONTINUES, JclTypes.STRING_CONTENT); }
+
+<WAITING_STRING_END_OR_CONTINUES,
+ WAITING_STRING_CONTENT_OR_STRING_END> {STRING_BRACKET}     { return jclBegin(WAITING_PARAM_DELIM, JclTypes.STRING_BRACKET); }
+
+<WAITING_STRING_END_OR_CONTINUES> {CRLF}                    { return jclBegin(STRING_LINE_CONTINUED, TokenType.WHITE_SPACE); }
+
+<STRING_LINE_CONTINUED> {LINE_START}                        { return jclBegin(WAITING_STRING_CONTENT_OR_STRING_END, JclTypes.LINE_START); }
+
 
 <WAITING_PARAM> {TUPLE}                                     { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TUPLE); }
 
@@ -252,7 +271,7 @@ INSTREAM_END=\/\*
 
 <WAITING_EQUALS_OR_DELIM> {EQUALS}                          { return jclBegin(WAITING_PARAM_VALUE, JclTypes.PARAM_EQUALS); }
 
-<WAITING_PARAM_VALUE> {STRING}                              { return jclBegin(WAITING_PARAM_DELIM, JclTypes.STRING); }
+<WAITING_PARAM_VALUE> {STRING_BRACKET}                      { return jclBegin(WAITING_STRING_CONTENT, JclTypes.STRING_BRACKET); }
 
 <WAITING_PARAM_VALUE> {TUPLE}                               { return jclBegin(WAITING_PARAM_DELIM, JclTypes.TUPLE); }
 

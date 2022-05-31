@@ -71,7 +71,7 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     if (tokenType == JclTypes.OPERATOR_OVERRIDE_NAME) {
       return OPERATOR_NAME_KEYS
     }
-    if (tokenType == JclTypes.STRING) {
+    if (tokenType == JclTypes.STRING_BRACKET || tokenType == JclTypes.STRING_CONTENT) {
       return STRING_KEYS
     }
     if (tokenType == JclTypes.PARAM_KEY || tokenType == JclTypes.INSTREAM_START || tokenType == JclTypes.INSTREAM_END) {
