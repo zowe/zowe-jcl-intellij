@@ -323,7 +323,8 @@ INSTREAM_END=\/\*
 
 <WAITING_PARAM_VALUE> {STRING_BRACKET}                      { return jclBegin(WAITING_STRING_CONTENT, JclTypes.STRING_BRACKET); }
 
-<WAITING_PARAM_VALUE> {TUPLE_START}                         { ++tupleInnerCounter; return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_START); }
+<WAITING_PARAM_VALUE,
+ WAITING_PARAM> {TUPLE_START}                         { ++tupleInnerCounter; return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_START); }
 
 <WAITING_PARAM_VALUE> {NOT_SPACE}                           { return jclBegin(WAITING_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
 
