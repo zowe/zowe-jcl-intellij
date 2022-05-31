@@ -297,7 +297,10 @@ INSTREAM_END=\/\*
 
 <WAITING_TUPLE_PARAM> {NOT_EQUALS_NOT_SPACE}                { return jclBegin(WAITING_TUPLE_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
 
-<WAITING_TUPLE_PARAM_DELIM> {PARAM_DELIM}                   { return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_PARAM_DELIM); }
+<WAITING_TUPLE_PARAM> {TUPLE_END}                           { return processTupleEnd(); }
+
+<WAITING_TUPLE_PARAM_DELIM,
+ WAITING_TUPLE_PARAM> {PARAM_DELIM}                         { return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_PARAM_DELIM); }
 
 <WAITING_TUPLE_PARAM_DELIM> {TUPLE_END}                     { return processTupleEnd(); }
 
@@ -329,6 +332,7 @@ INSTREAM_END=\/\*
 <WAITING_PARAM_VALUE> {NOT_SPACE}                           { return jclBegin(WAITING_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
 
 <WAITING_PARAM_DELIM,
+ WAITING_PARAM,
  WAITING_PARAM_DELIM_AFTER_INSTREAM_START> {PARAM_DELIM}    { return processParamDelim(); }
 
 <WAITING_PARAM_DELIM,
