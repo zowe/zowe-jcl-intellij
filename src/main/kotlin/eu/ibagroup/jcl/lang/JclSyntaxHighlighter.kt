@@ -59,7 +59,7 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     if (tokenType == JclTypes.COMMENT) {
       return COMMENT_KEYS
     }
-    if (tokenType == JclTypes.OPERATOR) {
+    if (tokenType == JclTypes.OPERATOR || tokenType == JclTypes.IF_OPERATOR || tokenType == JclTypes.IF_CONDITION_OPERATOR || tokenType == JclTypes.THEN_OPERATOR || tokenType == JclTypes.END_IF) {
       return OPERATOR_KEYS
     }
     if (tokenType == JclTypes.LINE_START) {

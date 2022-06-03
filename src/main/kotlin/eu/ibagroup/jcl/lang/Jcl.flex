@@ -3,7 +3,7 @@ package eu.ibagroup.jcl.lang;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import eu.ibagroup.jcl.lang.psi.JclTypes;
-import com.intellij.psi.TokenType;
+import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
 
 %%
 
@@ -24,6 +24,7 @@ import com.intellij.psi.TokenType;
   public boolean instreamParamStarted = false;
   public boolean firstParamInitialized = false;
   public int tupleInnerCounter = 0;
+  public int ifConditionInnerCounter = 0;
   public void moveBackTo(int position) {
       yypushback(Math.min(yycolumn+yylength()-position, yylength()));
   }
@@ -139,6 +140,15 @@ CRLF=\R
 SPACE=[\ \t\f]+
 STRING_CONTENT=[^\n\r\']*
 MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\\.]{1,7}
+IF_OPERATOR=[iI][fF]
+THEN_OPERATOR=[tT][hH][eE][nN]
+ENDIF_OPERATOR=[eE][nN][dD][iI][fF]
+IF_VALUE=[^\ \n\f\t\\,=\'\(\)\|\&><=¬]+
+IF_LOPERATOR=&|\|
+IF_LOPERATOR_DECLARATIVE=AND|OR
+IF_ROPERATOR=>|<|=|>=|<=|¬=|¬>|¬<
+IF_ROPERATOR_DECLARATIVE=GT|LT|EQ|GE|LE|NE|NG|NL
+IF_OPERATOR_NOT=¬
 NOT_SPACE=[^\ \n\f\t\\,\'\(\)]+
 NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\'\(\)]+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
@@ -156,7 +166,7 @@ PARAM_DELIM=,
 SEQUENCE_NUMBER=[^\n\r]{1,8}
 SN_STARTS_WITH_NOT_SPACE=[^\n\r\t\ \f]{1}[^\n\r]{0,7}
 INSTREAM_START=\*
-OPERATOR_NAME_DELIM=\.
+DOT=\.
 INSTREAM_END=\/\*
 
 
@@ -166,6 +176,18 @@ INSTREAM_END=\/\*
 %state WAITING_OVERRIDE_NAME
 %state WAITING_INSTREAM_OPERATOR
 %state WAITING_INSTREAM_OPERATOR_SPACE
+
+%state WAITING_SPACE_BEFORE_IF_CONDITION
+%state WAITING_IF_CONDITION_START_OR_VALUE
+%state WAITING_IF_CONDITION_VALUE
+%state WAITING_IF_CONDITION_VALUE_OR_SPACE
+%state WAITING_SPACE_BEFORE_IF_CONDITION_VALUE
+%state WAITING_IF_CONDITION_VALUE_OR_IF_END
+%state WAITING_IF_OPERATOR
+%state WAITING_IF_OPERATOR_OR_DOT
+%state WAITING_SPACE_OR_IF_OPERATOR
+%state WAITING_THEN_OPERATOR_SPACE
+%state WAITING_THEN_OPERATOR
 
 %state WAITING_SPACE_PARAMS
 %state WAITING_SPACE_PARAMS_OR_INSTREAM
@@ -206,7 +228,7 @@ INSTREAM_END=\/\*
 
 <LINE_STARTED> {MF_IDENTIFIER_NAME}                         { return jclBegin(WAITING_OPERATOR_OR_OVERRIDE_NAME, JclTypes.OPERATOR_NAME); }
 
-<WAITING_OPERATOR_OR_OVERRIDE_NAME> {OPERATOR_NAME_DELIM}   { return jclBegin(WAITING_OVERRIDE_NAME, JclTypes.OPERATOR_NAME_DELIM); }
+<WAITING_OPERATOR_OR_OVERRIDE_NAME> {DOT}                   { return jclBegin(WAITING_OVERRIDE_NAME, JclTypes.DOT); }
 
 <WAITING_OVERRIDE_NAME> {MF_IDENTIFIER_NAME}                { return jclBegin(WAITING_OPERATOR, JclTypes.OPERATOR_OVERRIDE_NAME); }
 
@@ -236,9 +258,66 @@ INSTREAM_END=\/\*
 <WAITING_OPERATOR,
     WAITING_OPERATOR_OR_OVERRIDE_NAME> {SPACE}              { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
 
+<WAITING_OPERATOR> {IF_OPERATOR}                            { return jclBegin(WAITING_SPACE_BEFORE_IF_CONDITION, JclTypes.IF_OPERATOR); }
+
+<WAITING_OPERATOR> {ENDIF_OPERATOR}                         { return jclBegin(WAITING_NEW_LINE, JclTypes.END_IF); }
+
 <WAITING_OPERATOR> {MF_IDENTIFIER_NAME}                     { return startParams(false, JclTypes.OPERATOR); }
 
 //<WAITING_OPERATOR> {DD_OPERATOR}                            { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
+
+
+
+
+<WAITING_SPACE_BEFORE_IF_CONDITION> {SPACE}                 { return jclBegin(WAITING_IF_CONDITION_START_OR_VALUE, TokenType.WHITE_SPACE); }
+
+<WAITING_IF_CONDITION_VALUE,
+WAITING_IF_CONDITION_VALUE_OR_SPACE,
+WAITING_IF_CONDITION_START_OR_VALUE> {TUPLE_START}         { ++ifConditionInnerCounter; return jclBegin(WAITING_IF_CONDITION_VALUE_OR_SPACE, JclTypes.IF_CONDITION_START); }
+
+<WAITING_IF_CONDITION_VALUE_OR_SPACE> {SPACE}                        { return jclBegin(WAITING_IF_CONDITION_VALUE, TokenType.WHITE_SPACE); }
+
+<WAITING_IF_CONDITION_VALUE,
+ WAITING_IF_CONDITION_VALUE_OR_SPACE,
+ WAITING_IF_CONDITION_START_OR_VALUE> {IF_VALUE}            { return jclBegin(WAITING_IF_OPERATOR_OR_DOT, JclTypes.PROPERTY_NAME); }
+
+<WAITING_IF_OPERATOR_OR_DOT> {DOT}                          { return jclBegin(WAITING_IF_CONDITION_VALUE, JclTypes.DOT); }
+
+<WAITING_IF_OPERATOR_OR_DOT> {SPACE}                        { return jclBegin(WAITING_IF_OPERATOR, TokenType.WHITE_SPACE); }
+
+<WAITING_SPACE_OR_IF_OPERATOR> {SPACE}                      { return jclBegin(WAITING_IF_OPERATOR, TokenType.WHITE_SPACE); }
+
+<WAITING_IF_OPERATOR,
+ WAITING_SPACE_OR_IF_OPERATOR,
+ WAITING_IF_OPERATOR_OR_DOT> {IF_ROPERATOR}                 { return jclBegin(WAITING_IF_CONDITION_VALUE_OR_SPACE, JclTypes.IF_CONDITION_OPERATOR); }
+
+<WAITING_IF_OPERATOR> {IF_ROPERATOR_DECLARATIVE}            { return jclBegin(WAITING_SPACE_BEFORE_IF_CONDITION_VALUE, JclTypes.IF_CONDITION_OPERATOR); }
+
+<WAITING_IF_OPERATOR> {IF_LOPERATOR}                        { return jclBegin(WAITING_SPACE_BEFORE_IF_CONDITION_VALUE, JclTypes.IF_CONDITION_OPERATOR); }
+
+<WAITING_IF_OPERATOR> {IF_LOPERATOR_DECLARATIVE}            { return jclBegin(WAITING_SPACE_BEFORE_IF_CONDITION_VALUE, JclTypes.IF_CONDITION_OPERATOR); }
+
+<WAITING_SPACE_BEFORE_IF_CONDITION_VALUE> {SPACE}           { return jclBegin(WAITING_IF_CONDITION_VALUE, TokenType.WHITE_SPACE); }
+
+<WAITING_IF_OPERATOR,
+ WAITING_IF_OPERATOR_OR_DOT> {TUPLE_END}                    {
+          --ifConditionInnerCounter;
+          return jclBegin(WAITING_SPACE_OR_IF_OPERATOR, JclTypes.IF_CONDITION_END);
+      }
+
+<WAITING_IF_OPERATOR> {THEN_OPERATOR}                       { if (ifConditionInnerCounter <= 0) return jclBegin(WAITING_NEW_LINE, JclTypes.THEN_OPERATOR); else return jclBegin(WAITING_NEW_LINE, TokenType.BAD_CHARACTER); }
+
+//<WAITING_THEN_OPERATOR_SPACE> {SPACE}                       { return jclBegin(WAITING_THEN_OPERATOR, TokenType.WHITE_SPACE); }
+//
+//<WAITING_THEN_OPERATOR> {THEN_OPERATOR}                     { return jclBegin(WAITING_NEW_LINE, JclTypes.THEN_OPERATOR); }
+
+
+
+
+
+
+
+
 
 <WAITING_SPACE_PARAMS> {SPACE}                              { return jclBegin(WAITING_PARAM, TokenType.WHITE_SPACE); }
 
