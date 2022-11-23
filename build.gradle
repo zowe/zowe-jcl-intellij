@@ -22,11 +22,11 @@ intellij {
     version = '2022.1'
 }
 patchPluginXml {
-    sinceBuild = "203.5981"
-    untilBuild = "221.*"
-    changeNotes = """
+    sinceBuild.set("203.5981")
+    untilBuild.set("223.*")
+    changeNotes.set("""
       Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      <em>most HTML tags may be used</em>""")
 }
 test {
     useJUnitPlatform()
