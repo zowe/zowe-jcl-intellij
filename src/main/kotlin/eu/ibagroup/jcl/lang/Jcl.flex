@@ -168,6 +168,7 @@ SN_STARTS_WITH_NOT_SPACE=[^\n\r\t\ \f]{1}[^\n\r]{0,7}
 INSTREAM_START=\*
 DOT=\.
 INSTREAM_END=\/\*
+NULL_STATEMENT_SPACE=[\ \t\f]{70,78}
 
 
 %state LINE_STARTED
@@ -235,6 +236,8 @@ INSTREAM_END=\/\*
 <WAITING_OVERRIDE_NAME> {SPACE}                             { return jclBegin(WAITING_OPERATOR, TokenType.BAD_CHARACTER); }
 
 <WAITING_INSTREAM_OPERATOR_SPACE> {MF_IDENTIFIER_NAME}      { return jclBegin(WAITING_OPERATOR_OR_OVERRIDE_NAME, JclTypes.OPERATOR_NAME); }
+
+<LINE_STARTED> {NULL_STATEMENT_SPACE}                       { return jclBegin(WAITING_SN, TokenType.WHITE_SPACE); }
 
 <LINE_STARTED> {SPACE}                                      { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
 
