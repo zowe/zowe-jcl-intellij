@@ -18,6 +18,7 @@ class JclColorSettingsPage: ColorSettingsPage {
       AttributesDescriptor("Parameter name", JclSyntaxHighlighter.PARAM_NAME),
       AttributesDescriptor("Parameter value", JclSyntaxHighlighter.PARAM_VALUE),
       AttributesDescriptor("String", JclSyntaxHighlighter.STRING),
+      AttributesDescriptor("Sequence numbers", JclSyntaxHighlighter.SEQUENCE_NUMBERS)
     )
   }
 
@@ -32,7 +33,7 @@ class JclColorSettingsPage: ColorSettingsPage {
   override fun getHighlighter(): SyntaxHighlighter = JclSyntaxHighlighter()
 
   override fun getDemoText(): String =
-    "//GENDATA7 JOB 1,CHRIS,MSGCLASS=X                                       comment\n" +
+    "//GENDATA7 JOB 1,CHRIS,MSGCLASS=X                                       seqNumb\n" +
     "//         EXEC PGM=IEBDG\n" +
     "//* THIS IS DEMO COMMENT\n" +
     "//SYSPRINT DD SYSOUT=*\n" +

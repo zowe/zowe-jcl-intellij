@@ -48,7 +48,7 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
     private final val STRING_KEYS = arrayOf(STRING)
     private final val PARAM_NAME_KEYS = arrayOf(PARAM_NAME)
     private final val PARAM_VALUE_KEYS = arrayOf(PARAM_VALUE)
-//    private final val SEQUENCE_NUMBERS_KEYS = arrayOf(SEQUENCE_NUMBERS)
+    private final val SEQUENCE_NUMBERS_KEYS = arrayOf(SEQUENCE_NUMBERS)
     private final val INSTREAM_TEXT_KEYS = arrayOf(INSTREAM_TEXT)
     private final val EMPTY_KEYS = arrayOf<TextAttributesKey>()
   }
@@ -84,7 +84,7 @@ class JclSyntaxHighlighter: SyntaxHighlighter {
       return PARAM_VALUE_KEYS
     }
     if (tokenType == JclTypes.SEQUENCE_NUMBERS) {
-      return COMMENT_KEYS
+      return SEQUENCE_NUMBERS_KEYS
     }
     if (tokenType == JclTypes.INSTREAM_TEXT) {
       return INSTREAM_TEXT_KEYS
