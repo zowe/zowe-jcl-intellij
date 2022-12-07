@@ -39,31 +39,25 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           yybegin(state);
           return TokenType.BAD_CHARACTER;
       }
-      if (elementType == JclTypes.COMMENT && yycolumn < 72) {
-        if (yycolumn+yylength() > 72) {
-          canCommentContinue = yytext().charAt(72-yycolumn) != ' ';
+      if (elementType == JclTypes.COMMENT && yycolumn < 71) {
+        if (yycolumn+yylength() > 71) {
+          canCommentContinue = yytext().charAt(71-yycolumn) != ' ';
         } else {
           canCommentContinue = false;
         }
       }
-      if (72 < yycolumn+yylength() && yycolumn < 80 && !isSequenceNumberOrWhiteSpace(elementType)) {
-          moveBackTo(72);
-          if (yycolumn!=72) {
+      if (71 < yycolumn+yylength() && yycolumn < 79 && !isSequenceNumberOrWhiteSpace(elementType)) {
+          moveBackTo(71);
+          if (yycolumn!=71) {
             prevState = state;
           }
           yybegin(WAITING_SN);
           return elementType;
       }
-      if (yycolumn < 72 && elementType == JclTypes.SEQUENCE_NUMBERS) {
-          yypushback(yylength()-1);
-          yycolumn-=yylength()-1;
-          yybegin(state);
-          return TokenType.BAD_CHARACTER;
-      }
 
       if (elementType != JclTypes.CRLF) {
-        if (yycolumn +yylength() > 80 && !movedBack) {
-          moveBackTo(80);
+        if (yycolumn+yylength() > 79 && !movedBack) {
+          moveBackTo(79);
           movedBack = true;
           yybegin(prevState);
           return elementType;
@@ -101,24 +95,24 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       }
   }
   public IElementType processParamDelim () {
-      if (yycolumn != 72) {
+      if (yycolumn != 71) {
           firstParamInitialized = true;
           return jclBegin(WAITING_PARAM, JclTypes.PARAM_DELIM);
       } else {
-          moveBackTo(72);
+          moveBackTo(71);
           prevState = WAITING_PARAM_DELIM;
           yybegin(WAITING_SN);
           return TokenType.WHITE_SPACE;
       }
   }
   public IElementType processSimpleParam () {
-      if ((yytext().toString().equals("*") && yycolumn <= 71) || (yytext().toString().startsWith("*") && yycolumn == 71)) {
+      if ((yytext().toString().equals("*") && yycolumn <= 70) || (yytext().toString().startsWith("*") && yycolumn == 70)) {
           instreamParamStarted = true;
           return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START);
-      } else if (yycolumn <= 71) {
+      } else if (yycolumn <= 70) {
           return jclBegin(WAITING_EQUALS_OR_DELIM, JclTypes.PARAM_KEY);
       } else {
-          moveBackTo(72);
+          moveBackTo(71);
           prevState = WAITING_PARAM;
           yybegin(WAITING_SN);
           return TokenType.WHITE_SPACE;
@@ -235,6 +229,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 %state INSTREAM_LINE_CONTINUED
 
 %state WAITING_COMMENT_CONTINUED_LINE
+%state WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED
 
 %state WAITING_SN
 %state WAITING_SN_OR_NEW_LINE
@@ -486,6 +481,8 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 <WAITING_COMMENT_CONTINUED_LINE> {COMMENT_CONTINUES_LINE}   { return jclBegin(WAITING_SN_OR_NEW_LINE, JclTypes.COMMENT); }
 
+<WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED> {COMMENT_CONTINUES_LINE}   { return jclBegin(WAITING_SN_OR_LINE_CONTINUES, JclTypes.COMMENT); }
+
 
 <WAITING_SN> {SEQUENCE_NUMBER}                              { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
 
@@ -501,7 +498,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 <WAITING_SN_OR_LINE_CONTINUES> {SPACE}+{CRLF}               { return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); }
 
-<WAITING_SN_OR_LINE_CONTINUES> {CRLF}                       { return jclBegin(LINE_CONTINUED, JclTypes.CRLF); }
+<WAITING_SN_OR_LINE_CONTINUES> {CRLF}                       { if (canCommentContinue) return jclBegin(WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED, JclTypes.CRLF); else return jclBegin(LINE_CONTINUED, JclTypes.CRLF); }
 
 {CRLF}+                                                     {
           if (instreamParamStarted) {
