@@ -24,14 +24,14 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   public boolean instreamParamStarted = false;
   public boolean instreamStartedWithData = false;
   public boolean firstParamInitialized = false;
+  public boolean canCommentContinue = false;
   public int tupleInnerCounter = 0;
   public int ifConditionInnerCounter = 0;
   public void moveBackTo(int position) {
       yypushback(Math.min(yycolumn+yylength()-position, yylength()));
   }
-  public boolean isCommentOrWhiteSpace (IElementType elementType) {
+  public boolean isSequenceNumberOrWhiteSpace (IElementType elementType) {
       return elementType == JclTypes.SEQUENCE_NUMBERS
-       || elementType == JclTypes.COMMENT
        || elementType == TokenType.WHITE_SPACE
        || elementType == JclTypes.CRLF;
   }
@@ -40,24 +40,25 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           yybegin(state);
           return TokenType.BAD_CHARACTER;
       }
-      if (72 < yycolumn+yylength() && yycolumn < 80 && !isCommentOrWhiteSpace(elementType)) {
-          moveBackTo(72);
-          if (yycolumn!=72) {
+      if (elementType == JclTypes.COMMENT && yycolumn < 71) {
+        if (yycolumn+yylength() > 71) {
+          canCommentContinue = yytext().charAt(71-yycolumn) != ' ';
+        } else {
+          canCommentContinue = false;
+        }
+      }
+      if (71 < yycolumn+yylength() && yycolumn < 79 && !isSequenceNumberOrWhiteSpace(elementType)) {
+          moveBackTo(71);
+          if (yycolumn!=71) {
             prevState = state;
           }
           yybegin(WAITING_SN);
           return elementType;
       }
-      if (yycolumn < 72 && elementType == JclTypes.SEQUENCE_NUMBERS) {
-          yypushback(yylength()-1);
-          yycolumn-=yylength()-1;
-          yybegin(state);
-          return TokenType.BAD_CHARACTER;
-      }
 
       if (elementType != JclTypes.CRLF) {
-        if (yycolumn +yylength() > 80 && !movedBack) {
-          moveBackTo(80);
+        if (yycolumn+yylength() > 79 && !movedBack) {
+          moveBackTo(79);
           movedBack = true;
           yybegin(prevState);
           return elementType;
@@ -91,11 +92,11 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       }
   }
   public IElementType processParamDelim () {
-      if (yycolumn != 72) {
+      if (yycolumn != 71) {
           firstParamInitialized = true;
           return jclBegin(WAITING_PARAM, JclTypes.PARAM_DELIM);
       } else {
-          moveBackTo(72);
+          moveBackTo(71);
           prevState = WAITING_PARAM_DELIM;
           yybegin(WAITING_SN);
           return TokenType.WHITE_SPACE;
@@ -112,10 +113,10 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           instreamParamStarted = true;
           instreamStartedWithData = true;
           return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START);
-      } else if (yycolumn <= 71) {
+      } else if (yycolumn <= 70) {
           return jclBegin(WAITING_EQUALS_OR_DELIM, JclTypes.PARAM_KEY);
       } else {
-          moveBackTo(72);
+          moveBackTo(71);
           prevState = WAITING_PARAM;
           yybegin(WAITING_SN);
           return TokenType.WHITE_SPACE;
@@ -184,6 +185,8 @@ INSTREAM_START=\*|DATA
 DOT=\.
 INSTREAM_END=\/\*
 NULL_STATEMENT_SPACE=[\ \t\f]{70,78}
+COMMENT=[^\n\r]+
+COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 
 %state LINE_STARTED
@@ -237,6 +240,9 @@ NULL_STATEMENT_SPACE=[\ \t\f]{70,78}
 %state WAITING_INSTREAM_CONTINUES
 %state LINE_CONTINUED
 %state INSTREAM_LINE_CONTINUED
+
+%state WAITING_COMMENT_CONTINUED_LINE
+%state WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED
 
 %state WAITING_SN
 %state WAITING_SN_OR_NEW_LINE
@@ -478,15 +484,30 @@ NULL_STATEMENT_SPACE=[\ \t\f]{70,78}
 <WAITING_EQUALS_OR_DELIM> {CRLF}                            { return endParams(JclTypes.CRLF); }
 
 
+<WAITING_NEW_LINE> {COMMENT}                                { return jclBegin(WAITING_SN_OR_NEW_LINE, JclTypes.COMMENT); }
+
+<WAITING_LINE_CONTINUES> {COMMENT}                          { return jclBegin(WAITING_SN_OR_LINE_CONTINUES, JclTypes.COMMENT); }
+
+<WAITING_COMMENT_CONTINUED_LINE> {COMMENT_CONTINUES_LINE}   { return jclBegin(WAITING_SN_OR_NEW_LINE, JclTypes.COMMENT); }
+
+<WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED> {COMMENT_CONTINUES_LINE}   { return jclBegin(WAITING_SN_OR_LINE_CONTINUES, JclTypes.COMMENT); }
 
 
 <WAITING_SN> {SEQUENCE_NUMBER}                              { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
 
-<WAITING_NEW_LINE> {SPACE}?{SEQUENCE_NUMBER}                { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
-
-<WAITING_LINE_CONTINUES> {SPACE}?{SEQUENCE_NUMBER}          { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
-
 <WAITING_INSTREAM_CONTINUES> {SPACE}?{SEQUENCE_NUMBER}      { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
+
+<WAITING_SN_OR_NEW_LINE> {SEQUENCE_NUMBER}                  { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
+
+<WAITING_SN_OR_NEW_LINE> {SPACE}+{CRLF}                     { return jclBegin(YYINITIAL, TokenType.WHITE_SPACE); }
+
+<WAITING_SN_OR_NEW_LINE> {CRLF}                             { if (canCommentContinue) return jclBegin(WAITING_COMMENT_CONTINUED_LINE, JclTypes.CRLF); else return jclBegin(YYINITIAL, JclTypes.CRLF); }
+
+<WAITING_SN_OR_LINE_CONTINUES> {SEQUENCE_NUMBER}            { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
+
+<WAITING_SN_OR_LINE_CONTINUES> {SPACE}+{CRLF}               { return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); }
+
+<WAITING_SN_OR_LINE_CONTINUES> {CRLF}                       { if (canCommentContinue) return jclBegin(WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED, JclTypes.CRLF); else return jclBegin(LINE_CONTINUED, JclTypes.CRLF); }
 
 {CRLF}+                                                     {
           if (instreamParamStarted) {
