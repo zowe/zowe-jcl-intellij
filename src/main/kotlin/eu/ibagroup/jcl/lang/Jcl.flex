@@ -22,6 +22,7 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   public int prevState = 0;
   public boolean movedBack = false;
   public boolean instreamParamStarted = false;
+  public boolean instreamStartedWithData = false;
   public boolean firstParamInitialized = false;
   public boolean canCommentContinue = false;
   public int tupleInnerCounter = 0;
@@ -73,10 +74,6 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       yybegin(state);
       return elementType == JclTypes.CRLF ? TokenType.WHITE_SPACE : elementType;
   }
-  public IElementType startParams(boolean isInstreamParams, IElementType elementType) {
-      instreamParamStarted = isInstreamParams;
-      return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, elementType);
-  }
   public IElementType endParams(IElementType elementType) {
       firstParamInitialized = false;
       if (instreamParamStarted) {
@@ -106,8 +103,15 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       }
   }
   public IElementType processSimpleParam () {
-      if ((yytext().toString().equals("*") && yycolumn <= 70) || (yytext().toString().startsWith("*") && yycolumn == 70)) {
+      if ((yytext().toString().equals("*") && yycolumn <= 71) ||
+            (yytext().toString().startsWith("*") && yycolumn == 71)
+      ) {
           instreamParamStarted = true;
+          return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START);
+      } else if ((yytext().toString().equals("DATA") && yycolumn <= 68) ||
+                    (yytext().toString().startsWith("DATA") && yycolumn == 68)) {
+          instreamParamStarted = true;
+          instreamStartedWithData = true;
           return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START);
       } else if (yycolumn <= 70) {
           return jclBegin(WAITING_EQUALS_OR_DELIM, JclTypes.PARAM_KEY);
@@ -116,6 +120,15 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           prevState = WAITING_PARAM;
           yybegin(WAITING_SN);
           return TokenType.WHITE_SPACE;
+      }
+  }
+  public IElementType processInstreamEnd() {
+      if (!instreamStartedWithData) {
+          return jclBegin(LINE_STARTED, JclTypes.LINE_START);
+      }
+      else {
+          moveBackTo(0);
+          return jclBegin(WAITING_INSTREAM_DATA_LINE, TokenType.WHITE_SPACE);
       }
   }
   public IElementType processStringEnd () {
@@ -141,9 +154,9 @@ CRLF=\R
 SPACE=[\ \t\f]+
 STRING_CONTENT=[^\n\r\']*
 MF_IDENTIFIER_NAME=[A-Za-z]{1}[^,=\*\ \n\f\t\/\\\.]{1,7}
-IF_OPERATOR=[iI][fF]
-THEN_OPERATOR=[tT][hH][eE][nN]
-ENDIF_OPERATOR=[eE][nN][dD][iI][fF]
+IF_OPERATOR=IF
+THEN_OPERATOR=THEN
+ENDIF_OPERATOR=ENDIF
 IF_VALUE=[^\ \n\f\t\\,=\'\(\)\|\&><=¬\.0-9][^\ \n\f\t\\,=\'\(\)\|\&><=¬\.]*
 IF_VALUE_DIGITAL=[0-9]+
 IF_LOPERATOR=&|\|
@@ -155,6 +168,7 @@ NOT_SPACE=[^\ \n\f\t\\,\'\(\)]+
 NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\'\(\)]+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
 INSTREAM_SIMPLE_LINE=\/|(\/[^\/\n\r][^\n\r]{0,70})|([^\/][^\n\r]{0,71})
+INSTREAM_DATA_LINE=\/\/[^\n\r]{0,70}
 LINE_START=\/\/
 TEMPLATE_PARAM=(\{\{.+\}\})
 STRING=\'.*\'
@@ -167,7 +181,7 @@ EQUALS==
 PARAM_DELIM=,
 SEQUENCE_NUMBER=[^\n\r]{1,8}
 SN_STARTS_WITH_NOT_SPACE=[^\n\r\t\ \f]{1}[^\n\r]{0,7}
-INSTREAM_START=\*
+INSTREAM_START=\*|DATA
 DOT=\.
 INSTREAM_END=\/\*
 NULL_STATEMENT_SPACE=[\ \t\f]{70,78}
@@ -179,8 +193,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 %state WAITING_OPERATOR
 %state WAITING_OPERATOR_OR_OVERRIDE_NAME
 %state WAITING_OVERRIDE_NAME
-%state WAITING_INSTREAM_OPERATOR
-%state WAITING_INSTREAM_OPERATOR_SPACE
+%state WAITING_INSTREAM_DATA_LINE
 
 %state WAITING_SPACE_BEFORE_IF_CONDITION
 %state WAITING_IF_CONDITION_START_OR_VALUE
@@ -249,8 +262,6 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 <WAITING_OVERRIDE_NAME> {SPACE}                             { return jclBegin(WAITING_OPERATOR, TokenType.BAD_CHARACTER); }
 
-<WAITING_INSTREAM_OPERATOR_SPACE> {MF_IDENTIFIER_NAME}      { return jclBegin(WAITING_OPERATOR_OR_OVERRIDE_NAME, JclTypes.OPERATOR_NAME); }
-
 <LINE_STARTED> {NULL_STATEMENT_SPACE}                       { return jclBegin(WAITING_SN, TokenType.WHITE_SPACE); }
 
 <LINE_STARTED> {SPACE}                                      { return jclBegin(WAITING_OPERATOR, TokenType.WHITE_SPACE); }
@@ -261,15 +272,13 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 <INSTREAM_LINE_CONTINUED> {END_OF_LINE_COMMENT}             { return jclBegin(WAITING_INSTREAM_CONTINUES, JclTypes.COMMENT); }
 
-<INSTREAM_LINE_CONTINUED> {INSTREAM_END}                    { return jclBegin(WAITING_NEW_LINE, JclTypes.INSTREAM_END); }
+<INSTREAM_LINE_CONTINUED> {INSTREAM_END}                    { instreamStartedWithData = false; return jclBegin(WAITING_NEW_LINE, JclTypes.INSTREAM_END); }
 
-<INSTREAM_LINE_CONTINUED> {LINE_START}                      { return jclBegin(WAITING_INSTREAM_OPERATOR_SPACE, JclTypes.LINE_START); }
-
-<WAITING_INSTREAM_OPERATOR_SPACE> {SPACE}                   { return jclBegin(WAITING_INSTREAM_OPERATOR, TokenType.WHITE_SPACE); }
-
-<WAITING_INSTREAM_OPERATOR> {MF_IDENTIFIER_NAME}            { return startParams(true, JclTypes.OPERATOR); }
+<INSTREAM_LINE_CONTINUED> {LINE_START}                      { return processInstreamEnd(); }
 
 <INSTREAM_LINE_CONTINUED> {INSTREAM_SIMPLE_LINE}            { return jclBegin(WAITING_INSTREAM_CONTINUES, JclTypes.INSTREAM_TEXT); }
+
+<WAITING_INSTREAM_DATA_LINE> {INSTREAM_DATA_LINE}           { return jclBegin(WAITING_INSTREAM_CONTINUES, JclTypes.INSTREAM_TEXT); }
 
 
 <WAITING_OPERATOR,
@@ -279,7 +288,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 <WAITING_OPERATOR> {ENDIF_OPERATOR}                         { return jclBegin(WAITING_NEW_LINE, JclTypes.END_IF); }
 
-<WAITING_OPERATOR> {MF_IDENTIFIER_NAME}                     { return startParams(false, JclTypes.OPERATOR); }
+<WAITING_OPERATOR> {MF_IDENTIFIER_NAME}                     { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
 
 //<WAITING_OPERATOR> {DD_OPERATOR}                            { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
 
