@@ -152,7 +152,7 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
 
 CRLF=\R
 SPACE=[\ \t\f]+
-STRING_CONTENT=[^\n\r\']*
+STRING_CONTENT=([^\n\r\']|\'\')*
 MF_IDENTIFIER_NAME=[^,=\*\ \n\f\t\/\\\.]{1,8}
 IF_OPERATOR=IF
 THEN_OPERATOR=THEN
