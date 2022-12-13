@@ -164,7 +164,7 @@ IF_LOPERATOR_DECLARATIVE=AND|OR
 IF_ROPERATOR=>|<|=|>=|<=|¬=|¬>|¬<
 IF_ROPERATOR_DECLARATIVE=GT|LT|EQ|GE|LE|NE|NG|NL
 IF_OPERATOR_NOT=¬
-NOT_SPACE=[^\ \n\f\t\\,\'\(\)]+
+PARAM_VALUE=[^\ \n\f\t\\,\'\(\)]{1}[^\ \n\f\t\\,\']*
 NOT_EQUALS_NOT_SPACE=[^\ \n\f\t\\,=\'\(\)]+
 END_OF_LINE_COMMENT=\/\/\*[^\n\r]*
 INSTREAM_SIMPLE_LINE=\/|(\/[^\/\n\r][^\n\r]{0,70})|([^\/][^\n\r]{0,71})
@@ -461,7 +461,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 <WAITING_PARAM_VALUE,
  WAITING_PARAM> {TUPLE_START}                               { ++tupleInnerCounter; return jclBegin(WAITING_TUPLE_PARAM, JclTypes.TUPLE_START); }
 
-<WAITING_PARAM_VALUE> {NOT_SPACE}                           { return jclBegin(WAITING_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
+<WAITING_PARAM_VALUE> {PARAM_VALUE}                         { return jclBegin(WAITING_PARAM_DELIM, JclTypes.SIMPLE_VALUE); }
 
 <WAITING_PARAM_DELIM,
  WAITING_PARAM,
