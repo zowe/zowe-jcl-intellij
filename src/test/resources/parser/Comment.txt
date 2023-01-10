@@ -1,0 +1,8 @@
+Jcl File(0,153)
+  PsiComment(comment)('//* THE COMMENT STATEMENT CANNOT BE CONTINUED,')(0,46)
+  PsiWhiteSpace('\n')(46,47)
+  PsiComment(comment)('//* BUT IF YOU HAVE A LOT TO SAY, YOU CAN FOLLOW A')(47,97)
+  PsiWhiteSpace('\n')(97,98)
+  PsiComment(comment)('//* COMMENT STATEMENT WITH MORE COMMENT')(98,137)
+  PsiWhiteSpace('\n')(137,138)
+  PsiComment(comment)('//* STATEMENTS.')(138,153)

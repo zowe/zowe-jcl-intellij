@@ -1,0 +1,3 @@
+//SYSUT2   DD DSN=userid.IBMMF.OUTPUT,
+//        DISP=(NEW,CATLG,DELETE),
+//        DCB=*.SYSUT1,SPACE=(CYL,(50,1),RLSE)
