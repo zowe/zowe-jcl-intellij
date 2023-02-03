@@ -1,7 +1,37 @@
 package eu.ibagroup.jcl.lang
 
 object JclConstants {
-  val OPERATORS = listOf("DD", "JOB", "EXEC", "INCLUDE", "JCLLIB", "PROC", "PEND", "IF", "THEN", "ELSE", "ENDIF")
+  val OPERATORS = listOf(
+    "DD",
+    "JOB",
+    "EXEC",
+    "INCLUDE",
+    "JCLLIB",
+    "PROC",
+    "PEND",
+    "IF",
+    "THEN",
+    "ELSE",
+    "ENDIF",
+    "OUTPUT",
+    "EXPORT",
+    "SET",
+    "SCHEDULE",
+    "XMIT",
+    "JOBGROUP",
+    "ENDGROUP",
+    "GJOB",
+    "AFTER",
+    "BEFORE",
+    "CONCURRENT",
+    "CNTL",
+    "PRINTDEV",
+    "ENDCNTL",
+    "JOBSET",
+    "ENDSET",
+    "SJOB",
+    "COMMAND"
+  )
 
   val DD_OPERATOR_PARAMS = listOf("DSN", "DISP", "DCB", "SPACE", "UNIT", "VOL", "SYSOUT")
 

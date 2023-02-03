@@ -154,6 +154,7 @@ CRLF=\R
 SPACE=[\ \t\f]+
 STRING_CONTENT=([^\n\r\']|\'\')*
 MF_IDENTIFIER_NAME=[^,=\*\ \n\f\t\/\\\.]{1,8}
+MF_OPERATOR_NAME=[^,=\*\ \n\f\t\/\\\.]{1,10}
 IF_OPERATOR=IF
 THEN_OPERATOR=THEN
 ENDIF_OPERATOR=ENDIF
@@ -288,7 +289,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 <WAITING_OPERATOR> {ENDIF_OPERATOR}                         { return jclBegin(WAITING_NEW_LINE, JclTypes.END_IF); }
 
-<WAITING_OPERATOR> {MF_IDENTIFIER_NAME}                     { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
+<WAITING_OPERATOR> {MF_OPERATOR_NAME}                       { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
 
 //<WAITING_OPERATOR> {DD_OPERATOR}                            { return jclBegin(WAITING_SPACE_PARAMS_OR_INSTREAM, JclTypes.OPERATOR); }
 
