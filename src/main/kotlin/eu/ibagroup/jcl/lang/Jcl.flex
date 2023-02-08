@@ -26,7 +26,6 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   public boolean firstParamInitialized = false;
   public boolean canCommentContinue = false;
   public int tupleInnerCounter = 0;
-  public int ifConditionInnerCounter = 0;
   public void moveBackTo(int position) {
       yypushback(Math.min(yycolumn+yylength()-position, yylength()));
   }
@@ -305,7 +304,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 <WAITING_IF_CONDITION_VALUE,
  WAITING_IF_CONDITION_VALUE_OR_SPACE,
  WAITING_IF_CONDITION_START_OR_VALUE,
- WAITING_IF_CONDITION_LOGICAL_VALUE> {TUPLE_START}          { ++ifConditionInnerCounter; return jclBegin(WAITING_IF_CONDITION_VALUE_OR_SPACE, JclTypes.IF_CONDITION_START); }
+ WAITING_IF_CONDITION_LOGICAL_VALUE> {TUPLE_START}          { return jclBegin(WAITING_IF_CONDITION_VALUE_OR_SPACE, JclTypes.IF_CONDITION_START); }
 
 <WAITING_IF_CONDITION_VALUE_OR_SPACE> {SPACE}               { return jclBegin(WAITING_IF_CONDITION_VALUE, TokenType.WHITE_SPACE); }
 
@@ -335,7 +334,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 
 <WAITING_SPACE_OR_IF_LOPERATOR> {SPACE}                     { return jclBegin(WAITING_IF_LOPERATOR, TokenType.WHITE_SPACE); }
 
-<WAITING_SPACE_OR_IF_LOPERATOR> {TUPLE_END}                 { --ifConditionInnerCounter; return jclBegin(WAITING_IF_LOPERATOR, JclTypes.IF_CONDITION_END); }
+<WAITING_SPACE_OR_IF_LOPERATOR> {TUPLE_END}                 { return jclBegin(WAITING_IF_LOPERATOR, JclTypes.IF_CONDITION_END); }
 
 <WAITING_IF_OPERATOR,
  WAITING_IF_OPERATOR_OR_DOT> {IF_ROPERATOR}                 { return jclBegin(WAITING_IF_CONDITION_VALUE_OR_SPACE_AFTER_RO, JclTypes.IF_CONDITION_OPERATOR); }
@@ -353,13 +352,10 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 <WAITING_SPACE_BEFORE_IF_CONDITION_VALUE_AFTER_RO> {SPACE}  { return jclBegin(WAITING_IF_CONDITION_VALUE_AFTER_RO, TokenType.WHITE_SPACE); }
 
 <WAITING_IF_OPERATOR,
- WAITING_IF_OPERATOR_OR_DOT> {TUPLE_END}                    {
-          --ifConditionInnerCounter;
-          return jclBegin(WAITING_SPACE_OR_IF_LOPERATOR, JclTypes.IF_CONDITION_END);
-      }
+ WAITING_IF_OPERATOR_OR_DOT> {TUPLE_END}                    { return jclBegin(WAITING_SPACE_OR_IF_LOPERATOR, JclTypes.IF_CONDITION_END); }
 
 <WAITING_IF_OPERATOR,
- WAITING_IF_LOPERATOR> {THEN_OPERATOR}                      { if (ifConditionInnerCounter <= 0) return jclBegin(WAITING_NEW_LINE, JclTypes.THEN_OPERATOR); else return jclBegin(WAITING_NEW_LINE, TokenType.BAD_CHARACTER); }
+ WAITING_IF_LOPERATOR> {THEN_OPERATOR}                      { return jclBegin(WAITING_NEW_LINE, JclTypes.THEN_OPERATOR); }
 
 //<WAITING_THEN_OPERATOR_SPACE> {SPACE}                       { return jclBegin(WAITING_THEN_OPERATOR, TokenType.WHITE_SPACE); }
 //
