@@ -1,6 +1,6 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-    id 'org.jetbrains.intellij' version '1.11.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'org.jetbrains.intellij' version '1.13.0'
     id 'java'
     id 'org.jetbrains.grammarkit' version '2021.2.2'
 }
@@ -13,8 +13,8 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -26,6 +26,13 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = '2022.1'
+    //type = 'IC'
+
+    // To have a dependency on for-mainframe from the marketplace
+    plugins = ['eu.ibagroup.formainframe:0.7.1']
+
+    // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
+    //plugins = ["${projectDir}\\libs\\for-mainframe"]
 }
 
 patchPluginXml {
@@ -80,8 +87,10 @@ tasks.named("generateLexer").configure {
 
 compileKotlin {
     dependsOn generateLexer
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+}
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
+compileTestKotlin {
+    dependsOn compileKotlin
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
