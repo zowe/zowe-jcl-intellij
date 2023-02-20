@@ -20,6 +20,7 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   public int yyline = 0;
   public int yycolumn = 0;
   public int prevState = 0;
+  public IElementType prevType = null;
   public boolean movedBack = false;
   public boolean instreamParamStarted = false;
   public boolean instreamStartedWithData = false;
@@ -33,6 +34,10 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       return elementType == JclTypes.SEQUENCE_NUMBERS
        || elementType == TokenType.WHITE_SPACE
        || elementType == JclTypes.CRLF;
+  }
+  public boolean isParamKeyOrValue (IElementType elementType) {
+      return elementType == JclTypes.PARAM_KEY
+       || elementType == JclTypes.SIMPLE_VALUE;
   }
   public IElementType jclBegin(int state, IElementType elementType) {
       if (elementType == JclTypes.LINE_START && yycolumn != 0) {
@@ -68,7 +73,20 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           return TokenType.BAD_CHARACTER;
         }
       }
+      if (prevType == TokenType.WHITE_SPACE && isParamKeyOrValue(elementType)) {
+          if (firstParamInitialized && (yycolumn < 3 || yycolumn > 15)) {
+              return TokenType.BAD_CHARACTER;
+          }
+      } else if (prevType == JclTypes.LINE_START && elementType == JclTypes.STRING_CONTENT) {
+          if (firstParamInitialized) {
+              int startChar = yytext().toString().indexOf(yytext().toString().trim());
+              if (startChar == 0 || startChar > 13) {
+              return TokenType.BAD_CHARACTER;
+              }
+          }
+      }
 
+      prevType = elementType;
       prevState = state;
       yybegin(state);
       return elementType == JclTypes.CRLF ? TokenType.WHITE_SPACE : elementType;
