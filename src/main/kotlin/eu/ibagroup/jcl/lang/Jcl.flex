@@ -26,6 +26,7 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
   public boolean instreamStartedWithData = false;
   public boolean firstParamInitialized = false;
   public boolean canCommentContinue = false;
+  public boolean isIfConditionContinues = false;
   public int tupleInnerCounter = 0;
   public void moveBackTo(int position) {
       yypushback(Math.min(yycolumn+yylength()-position, yylength()));
@@ -83,6 +84,13 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
               if (startChar == 0 || startChar > 13) {
               return TokenType.BAD_CHARACTER;
               }
+          }
+      } else if (prevType == TokenType.WHITE_SPACE && elementType == JclTypes.PROPERTY_NAME) {
+          if (isIfConditionContinues) {
+              if (yycolumn < 3 || yycolumn > 15) {
+                  return TokenType.BAD_CHARACTER;
+              }
+              isIfConditionContinues = false;
           }
       }
 
@@ -216,6 +224,7 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 %state WAITING_SPACE_BEFORE_IF_CONDITION
 %state WAITING_IF_CONDITION_START_OR_VALUE
 %state WAITING_IF_CONDITION_VALUE
+%state WAITING_IF_LINE_CONTUNUES
 %state WAITING_IF_CONDITION_VALUE_AFTER_RO
 %state WAITING_IF_CONDITION_LOGICAL_VALUE
 %state WAITING_IF_CONDITION_VALUE_OR_SPACE
@@ -370,6 +379,10 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 <WAITING_SPACE_BEFORE_IF_CONDITION_VALUE> {SPACE}           { return jclBegin(WAITING_IF_CONDITION_VALUE, TokenType.WHITE_SPACE); }
 
 <WAITING_SPACE_BEFORE_IF_CONDITION_VALUE_AFTER_RO> {SPACE}  { return jclBegin(WAITING_IF_CONDITION_VALUE_AFTER_RO, TokenType.WHITE_SPACE); }
+
+<WAITING_SPACE_BEFORE_IF_CONDITION_VALUE> {SPACE}*{CRLF}    { isIfConditionContinues = true; return jclBegin(WAITING_IF_LINE_CONTUNUES, TokenType.WHITE_SPACE); }
+
+<WAITING_IF_LINE_CONTUNUES> {LINE_START}                    { return jclBegin(WAITING_SPACE_BEFORE_IF_CONDITION_VALUE, JclTypes.LINE_START); }
 
 <WAITING_IF_OPERATOR,
  WAITING_IF_OPERATOR_OR_DOT> {TUPLE_END}                    { return jclBegin(WAITING_SPACE_OR_IF_LOPERATOR, JclTypes.IF_CONDITION_END); }
@@ -538,6 +551,8 @@ WAITING_TUPLE_PARAM_DELIM_OR_EQUALS> {TUPLE_END}            { return processTupl
 {CRLF}+                                                     {
           if (instreamParamStarted) {
               yybegin(INSTREAM_LINE_CONTINUED);
+          } else if (isIfConditionContinues) {
+              yybegin(WAITING_IF_CONDITION_VALUE);
           } else {
               yybegin(YYINITIAL);
           }
