@@ -52,9 +52,9 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           canCommentContinue = false;
         }
       }
-      if (71 < yycolumn+yylength() && yycolumn < 79 && !isSequenceNumberOrWhiteSpace(elementType)) {
-          moveBackTo(71);
-          if (yycolumn!=71) {
+      if (72 < yycolumn+yylength() && yycolumn < 80 && !isSequenceNumberOrWhiteSpace(elementType)) {
+          moveBackTo(72);
+          if (yycolumn!=72) {
             prevState = state;
           }
           yybegin(WAITING_SN);
@@ -62,8 +62,8 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       }
 
       if (elementType != JclTypes.CRLF) {
-        if (yycolumn+yylength() > 79 && !movedBack) {
-          moveBackTo(79);
+        if (yycolumn+yylength() > 80 && !movedBack) {
+          moveBackTo(80);
           movedBack = true;
           yybegin(prevState);
           return elementType;
@@ -117,19 +117,19 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
       }
   }
   public IElementType processParamDelim () {
-      if (yycolumn != 71) {
+      if (yycolumn != 72) {
           firstParamInitialized = true;
           return jclBegin(WAITING_PARAM, JclTypes.PARAM_DELIM);
       } else {
-          moveBackTo(71);
+          moveBackTo(72);
           prevState = WAITING_PARAM_DELIM;
           yybegin(WAITING_SN);
           return TokenType.WHITE_SPACE;
       }
   }
   public IElementType processSimpleParam () {
-      if ((yytext().toString().equals("*") && yycolumn <= 71) ||
-            (yytext().toString().startsWith("*") && yycolumn == 71)
+      if ((yytext().toString().equals("*") && yycolumn <= 72) ||
+            (yytext().toString().startsWith("*") && yycolumn == 72)
       ) {
           instreamParamStarted = true;
           return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START);
@@ -138,10 +138,10 @@ import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
           instreamParamStarted = true;
           instreamStartedWithData = true;
           return jclBegin(WAITING_PARAM_DELIM, JclTypes.INSTREAM_START);
-      } else if (yycolumn <= 70) {
+      } else if (yycolumn <= 71) {
           return jclBegin(WAITING_EQUALS_OR_DELIM, JclTypes.PARAM_KEY);
       } else {
-          moveBackTo(71);
+          moveBackTo(72);
           prevState = WAITING_PARAM;
           yybegin(WAITING_SN);
           return TokenType.WHITE_SPACE;
