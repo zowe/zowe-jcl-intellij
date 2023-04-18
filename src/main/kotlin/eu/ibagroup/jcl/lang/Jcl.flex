@@ -3,7 +3,8 @@ package eu.ibagroup.jcl.lang;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import eu.ibagroup.jcl.lang.psi.JclTypes;
-import com.intellij.psi.TokenType;import groovyjarjarantlr.Token;
+import com.intellij.psi.TokenType;
+import groovyjarjarantlr.Token;
 
 %%
 
@@ -443,7 +444,8 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 <WAITING_STRING_CONTENT,
  WAITING_STRING_CONTENT_OR_STRING_END> {STRING_CONTENT}     { return jclBegin(WAITING_STRING_END_OR_CONTINUES, JclTypes.STRING_CONTENT); }
 
-<WAITING_STRING_END_OR_CONTINUES,
+<WAITING_STRING_CONTENT,
+ WAITING_STRING_END_OR_CONTINUES,
  WAITING_STRING_CONTENT_OR_STRING_END> {STRING_BRACKET}     { return processStringEnd(); }
 
 <WAITING_STRING_END_OR_CONTINUES> {CRLF}                    { return jclBegin(STRING_LINE_CONTINUED, TokenType.WHITE_SPACE); }
