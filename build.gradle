@@ -37,7 +37,7 @@ patchPluginXml {
 }
 
 test {
-    //useJUnitPlatform()
+    // useJUnitPlatform()
     // see https://youtrack.jetbrains.com/issue/IDEA-278926
     scanForTestClasses false
     include "**/*Test*"
@@ -55,31 +55,29 @@ sourceSets {
 }
 
 grammarKit {
-    // version of IntelliJ patched JFlex - https://mvnrepository.com/artifact/org.jetbrains.intellij.deps.jflex/jflex
+    // version of IntelliJ patched JFlex - https://github.com/JetBrains/intellij-deps-jflex
     jflexRelease = '1.7.0-1'
-    // tag or short commit hash of Grammar-Kit to use - https://github.com/JetBrains/Grammar-Kit
+    // release version of Grammar-Kit - https://github.com/JetBrains/Grammar-Kit
     grammarKitRelease = System.getenv().getOrDefault('GRAMMAR_KIT_VERSION', '2021.1.2')
 }
 
-tasks.named("generateParser").configure {
-    source = "src/main/kotlin/eu/ibagroup/jcl/lang/Jcl.bnf"
+generateParser {
+    source = 'src/main/kotlin/eu/ibagroup/jcl/lang/Jcl.bnf'
     targetRoot = 'src/main/java'
     pathToParser = '/eu/ibagroup/jcl/lang/parser/JclParser.java'
     pathToPsiRoot = '/eu/ibagroup/jcl/lang/psi'
     purgeOldFiles = true
 }
 
-tasks.named("generateLexer").configure {
-    dependsOn generateParser
-
+generateLexer {
     source = 'src/main/kotlin/eu/ibagroup/jcl/lang/Jcl.flex'
-    targetDir = 'src/main/java/eu/ibagroup/jcl/lang/'
+    targetDir = 'src/main/java/eu/ibagroup/jcl/lang'
     targetClass = 'JclLexer'
     purgeOldFiles = true
 }
 
 compileKotlin {
-    dependsOn generateLexer
+    dependsOn(generateLexer, generateParser)
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
