@@ -1,4 +1,14 @@
-package eu.ibagroup.jcl.lang
+/*
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v20.html
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Copyright IBA Group 2023
+ */
+
+package org.zowe.jcl.lang
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
@@ -11,9 +21,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
-import eu.ibagroup.jcl.lang.parser.JclParser
-import eu.ibagroup.jcl.lang.psi.JclFile
-import eu.ibagroup.jcl.lang.psi.JclTypes
+import org.zowe.jcl.lang.parser.JclParser
+import org.zowe.jcl.lang.psi.JclFile
+import org.zowe.jcl.lang.psi.JclTypes
 
 class JclParserDefinition: ParserDefinition {
 

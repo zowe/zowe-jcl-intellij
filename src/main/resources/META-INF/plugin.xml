@@ -1,11 +1,20 @@
+<!--
+  This program and the accompanying materials are made available under the terms of the
+  Eclipse Public License v2.0 which accompanies this distribution, and is available at
+  https://www.eclipse.org/legal/epl-v20.html
+
+  SPDX-License-Identifier: EPL-2.0
+
+  Copyright IBA Group 2023
+-->
+
 <idea-plugin>
-    <id>eu.ibagroup.jcl-language</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>org.zowe.jcl-language</id>
+    <name>Zowe JCL Features</name>
+    <vendor email="zowe.robot@gmail.com" url="https://https://github.com/zowe/zowe-intellij-jcl-features">Zowe</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+Zowe IntelliJ JCL Features plugin that brings support for JCL language in IntelliJ platform.<br>
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
@@ -15,22 +24,22 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <fileType name="Jcl File"
-                  implementationClass="eu.ibagroup.jcl.lang.JclFileType"
+                  implementationClass="org.zowe.jcl.lang.JclFileType"
                   fieldName="INSTANCE"
                   language="JCL"
                   extensions="jcl"/>
 
         <lang.parserDefinition language="JCL"
-                               implementationClass="eu.ibagroup.jcl.lang.JclParserDefinition"/>
+                               implementationClass="org.zowe.jcl.lang.JclParserDefinition"/>
 
         <lang.syntaxHighlighterFactory language="JCL"
-                                       implementationClass="eu.ibagroup.jcl.lang.JclSyntaxHighlighterFactory"/>
+                                       implementationClass="org.zowe.jcl.lang.JclSyntaxHighlighterFactory"/>
 
-        <colorSettingsPage implementation="eu.ibagroup.jcl.lang.JclColorSettingsPage"/>
+        <colorSettingsPage implementation="org.zowe.jcl.lang.JclColorSettingsPage"/>
 
-        <annotator language="JCL" implementationClass="eu.ibagroup.jcl.lang.JclAnnotator"/>
+        <annotator language="JCL" implementationClass="org.zowe.jcl.lang.JclAnnotator"/>
 
-        <completion.contributor language="JCL" implementationClass="eu.ibagroup.jcl.lang.JclCompletionContributor"/>
+        <completion.contributor language="JCL" implementationClass="org.zowe.jcl.lang.JclCompletionContributor"/>
 
     </extensions>
 

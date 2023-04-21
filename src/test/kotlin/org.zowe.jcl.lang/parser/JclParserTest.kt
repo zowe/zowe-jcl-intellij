@@ -1,7 +1,17 @@
-package eu.ibagroup.jcl.lang.parser
+/*
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v20.html
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Copyright IBA Group 2023
+ */
+
+package org.zowe.jcl.lang.parser
 
 import com.intellij.testFramework.ParsingTestCase
-import eu.ibagroup.jcl.lang.JclParserDefinition
+import org.zowe.jcl.lang.JclParserDefinition
 
 class JclParserTest: ParsingTestCase("", "jcl", JclParserDefinition()) {
 
