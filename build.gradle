@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'eu.ibagroup'
-version '0.1'
+version '0.1.0-223'
 
 repositories {
     mavenCentral()
@@ -25,19 +25,19 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = '2022.1'
+    version = '2022.3'
     //type = 'IC'
 
     // To have a dependency on for-mainframe from the marketplace
-    plugins = ['eu.ibagroup.formainframe:0.7.1']
+    plugins = ['org.zowe.explorer:1.0.0']
 
     // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
     //plugins = ["${projectDir}\\libs\\for-mainframe"]
 }
 
 patchPluginXml {
-    sinceBuild.set("221.5080")
-    untilBuild.set("223.*")
+    sinceBuild.set("223.5080")
+    untilBuild.set("231.*")
     changeNotes.set("""
       Add change notes here.<br>
       <em>most HTML tags may be used</em>""")
