@@ -6,9 +6,9 @@ HEADRselect
 DETAL
 TRIALselect
 /*
-//SORTOUT  DD DSN=userid.IBMMF.OUTPUT,                                 sdf2sfsd
+//SORTOUT  DD DSN=userid.IBMMF.OUTPUT,                                  sdf2sfsd
 //        DISP=(NEW,CATLG,DELETE),
-//        DCB=*.SYSUT1,SPACE=(CYL,(50,1),RLSE)                         1qwertyu
+//        DCB=*.SYSUT1,SPACE=(CYL,(50,1),RLSE)                          1qwertyu
 //IFBAD     IF  (ABEND | STEP1.RC > 8) THEN
 //TRUE      EXEC  PROC=ERROR
 //IFBADEND  ENDIF
