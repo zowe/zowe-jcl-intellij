@@ -69,7 +69,7 @@ patchPluginXml {
         <li>Wrong number of characters in jcl highlight line</li>
         <li>Unexpected errors for procedure declaration</li>
         <li>Unexpected error for DD override in nested PROCs</li>
-        <li>Unexpected error if procedure's/job's name length=1 or name starts with national ($, #, @) characters</li>
+        <li>Unexpected error if procedure's/job's name length=1 or name starts with national (\$, #, @) characters</li>
         <li>THEN is not highlighted</li>
         <li>Unexpected error if continue relational expression in IF/THEN/ELSE/ENDIF construction</li>
         <li>Error if there is no space between closing parentheses in the relational expression</li>
