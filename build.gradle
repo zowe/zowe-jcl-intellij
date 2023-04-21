@@ -121,16 +121,16 @@ grammarKit {
 }
 
 generateParser {
-    source = 'src/main/kotlin/eu/ibagroup/jcl/lang/Jcl.bnf'
+    source = 'src/main/kotlin/org/zowe/jcl/lang/Jcl.bnf'
     targetRoot = 'src/main/java'
-    pathToParser = '/eu/ibagroup/jcl/lang/parser/JclParser.java'
-    pathToPsiRoot = '/eu/ibagroup/jcl/lang/psi'
+    pathToParser = '/org/zowe/jcl/lang/parser/JclParser.java'
+    pathToPsiRoot = '/org/zowe/jcl/lang/psi'
     purgeOldFiles = true
 }
 
 generateLexer {
-    source = 'src/main/kotlin/eu/ibagroup/jcl/lang/Jcl.flex'
-    targetDir = 'src/main/java/eu/ibagroup/jcl/lang'
+    source = 'src/main/kotlin/org/zowe/jcl/lang/Jcl.flex'
+    targetDir = 'src/main/java/org/zowe/jcl/lang'
     targetClass = 'JclLexer'
     purgeOldFiles = true
 }
