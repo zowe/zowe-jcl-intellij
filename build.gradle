@@ -1,3 +1,13 @@
+/*
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v20.html
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Copyright IBA Group 2023
+ */
+
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.7.10'
     id 'org.jetbrains.intellij' version '1.13.0'
@@ -5,7 +15,7 @@ plugins {
     id 'org.jetbrains.grammarkit' version '2021.2.2'
 }
 
-group 'eu.ibagroup'
+group 'org.zowe'
 version '0.1.0-223'
 
 repositories {
@@ -39,8 +49,50 @@ patchPluginXml {
     sinceBuild.set("223.5080")
     untilBuild.set("231.*")
     changeNotes.set("""
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>""")
+      <b>New features:</b>
+      <ul>
+        <li>Empty string as a parameter value</li>
+        <li>Comments after parameters end</li>
+        <li>Lexer tests</li>
+        <li>JCL Highlight init version</li>
+        <li>Support for IntelliJ 2023.1</li>
+      </ul>
+      <br>
+      <b>Fixed bugs:</b>
+      <ul>
+        <li>Error if keyword DATA is used in in-stream data declaration</li>
+        <li>Error for NULL statement</li>
+        <li>Operator NOT is Not recognized</li>
+        <li>Unexpected error if the parameter is nullified</li>
+        <li>Error if dataset member is a parameter</li>
+        <li>'No such operator' for ELSE</li>
+        <li>Wrong number of characters in jcl highlight line</li>
+        <li>Unexpected errors for procedure declaration</li>
+        <li>Unexpected error for DD override in nested PROCs</li>
+        <li>Unexpected error if procedure's/job's name length=1 or name starts with national ($, #, @) characters</li>
+        <li>THEN is not highlighted</li>
+        <li>Unexpected error if continue relational expression in IF/THEN/ELSE/ENDIF construction</li>
+        <li>Error if there is no space between closing parentheses in the relational expression</li>
+        <li>Error if parameter contains subparameters</li>
+        <li>Error if string or parameter contain apostrophe</li>
+        <li>Continue the interrupted parameter or field beginning in any column from 4 through 16</li>
+        <li>Comma (',') after asterisk ('*') in in-stream data is marked as error</li>
+        <li>Error for empty string in in-stream data</li>
+        <li>Error for parentheses in accounting info in the job card</li>
+        <li>'No such operator' for IF/ENDIF</li>
+        <li>Error when parameters continue on the next line</li>
+        <li>Error if accounting information in the job card is omitted</li>
+        <li>'No such operator' for OUTPUT / EXPORT/ SET</li>
+        <li>'No such operator' for CNTL / PRINTDEV / ENDCNTL</li>
+        <li>PATHMODE is not highlighted</li>
+        <li>'No such operator' for JOBGROUP/ENDGROUP/GJOB/AFTER/BEFORE/CONCURRENT</li>
+        <li>'No such operator' for JOBSET/ENDSET/SJOB</li>
+        <li>Strange parameter highlighting</li>
+        <li>'No such operator' for SCHEDULE/XMIT</li>
+        <li>'No such operator' for COMMAND</li>
+        <li>String cannot be continued on the next line</li>
+      </ul>
+    """)
 }
 
 test {

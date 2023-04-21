@@ -1,16 +1,26 @@
+/*
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v20.html
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Copyright IBA Group 2023
+ */
+
 {
-  parserClass="eu.ibagroup.jcl.lang.parser.JclParser"
+  parserClass="org.zowe.jcl.lang.parser.JclParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="Jcl"
   psiImplClassSuffix="Impl"
-  psiPackage="eu.ibagroup.jcl.lang.psi"
-  psiImplPackage="eu.ibagroup.jcl.lang.psi.impl"
+  psiPackage="org.zowe.jcl.lang.psi"
+  psiImplPackage="org.zowe.jcl.lang.psi.impl"
 
-  elementTypeHolderClass="eu.ibagroup.jcl.lang.psi.JclTypes"
-  elementTypeClass="eu.ibagroup.jcl.lang.psi.JclElementType"
-  tokenTypeClass="eu.ibagroup.jcl.lang.psi.JclTokenType"
+  elementTypeHolderClass="org.zowe.jcl.lang.psi.JclTypes"
+  elementTypeClass="org.zowe.jcl.lang.psi.JclElementType"
+  tokenTypeClass="org.zowe.jcl.lang.psi.JclTokenType"
 }
 
 jclFile ::= JCL_SYNTAX*
