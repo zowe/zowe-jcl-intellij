@@ -38,7 +38,7 @@ intellij {
     version = '2022.3'
     //type = 'IC'
 
-    // To have a dependency on for-mainframe from the marketplace
+    // To have a dependency on zowe explorer from the marketplace
     plugins = ['org.zowe.explorer:1.0.0']
 
     // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
