@@ -16,7 +16,7 @@ plugins {
 }
 
 group 'org.zowe'
-version '0.2.0-221'
+version '0.2.0-223'
 
 repositories {
     mavenCentral()
