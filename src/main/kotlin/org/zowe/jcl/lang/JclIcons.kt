@@ -10,8 +10,8 @@
 
 package org.zowe.jcl.lang
 
-import com.intellij.icons.AllIcons
+import com.intellij.openapi.util.IconLoader
 
 object JclIcons {
-  public final val FILE = AllIcons.FileTypes.XsdFile
+  public final val FILE = IconLoader.getIcon("icons/jclIcon", this::class.java)
 }
