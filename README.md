@@ -1,5 +1,5 @@
-# Zowe IntelliJ JCL Features
-Plugin for supporting JCL features in Intellij IDEA.
+# Zowe™ JCL plug-in for IntelliJ IDEA™
+Plug-in for supporting JCL features in Intellij IDEA™.
 The syntax highlight is available for .jcl files.
 
 ## For Developers
