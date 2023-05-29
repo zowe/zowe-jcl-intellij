@@ -9,12 +9,12 @@
 -->
 
 <idea-plugin>
-    <id>org.zowe.jcl-language</id>
-    <name>Zowe JCL Features</name>
-    <vendor email="zowe.robot@gmail.com" url="https://https://github.com/zowe/zowe-intellij-jcl-features">Zowe</vendor>
+    <id>org.zowe.jcl</id>
+    <name>Zowe™ JCL plug-in</name>
+    <vendor email="zowe.robot@gmail.com" url="https://https://github.com/zowe/zowe-intellij-jcl-features">Zowe™</vendor>
 
     <description><![CDATA[
-Zowe IntelliJ JCL Features plugin that brings support for JCL language in IntelliJ platform.<br>
+Zowe™ JCL Features plug-in that brings support for JCL language in IntelliJ IDEA™ platform.<br>
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
