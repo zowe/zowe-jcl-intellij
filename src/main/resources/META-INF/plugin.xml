@@ -20,6 +20,7 @@ Zowe™ JCL Features plug-in that brings support for JCL language in IntelliJ ID
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.zowe.explorer</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->

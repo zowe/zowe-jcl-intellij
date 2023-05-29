@@ -9,8 +9,8 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-    id 'org.jetbrains.intellij' version '1.11.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'org.jetbrains.intellij' version '1.13.0'
     id 'java'
     id 'org.jetbrains.grammarkit' version '2021.2.2'
 }
@@ -23,8 +23,8 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -35,12 +35,19 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = '2022.1'
+    version = '2022.3'
+    //type = 'IC'
+
+    // To have a dependency on zowe explorer from the marketplace
+    plugins = ['org.zowe.explorer:1.0.0']
+
+    // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
+    //plugins = ["${projectDir}\\libs\\for-mainframe"]
 }
 
 patchPluginXml {
-    sinceBuild.set("221.5080")
-    untilBuild.set("222.*")
+    sinceBuild.set("223.5080")
+    untilBuild.set("231.*")
     changeNotes.set("""
       <b>New features:</b>
       <ul>
@@ -48,6 +55,7 @@ patchPluginXml {
         <li>Comments after parameters end</li>
         <li>Lexer tests</li>
         <li>JCL Highlight init version</li>
+        <li>Support for IntelliJ 2023.1</li>
       </ul>
       <br>
       <b>Fixed bugs:</b>
@@ -129,8 +137,10 @@ generateLexer {
 
 compileKotlin {
     dependsOn(generateLexer, generateParser)
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+}
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
+compileTestKotlin {
+    dependsOn compileKotlin
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
