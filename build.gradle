@@ -129,10 +129,12 @@ generateLexer {
     purgeOldFiles = true
 }
 
+// needed until it becomes possible to set encoding of .flex file using the generateLexer task
+// see https://github.com/JetBrains/gradle-grammar-kit-plugin/issues/127
 tasks.register('generateJclLexer', JavaExec) {
     def jflexJar = "jflex-${jflexVersion}.jar"
-    def source = 'src/main/kotlin/eu/ibagroup/jcl/lang/Jcl.flex'
-    def targetDir = 'src/main/java/eu/ibagroup/jcl/lang'
+    def source = 'src/main/kotlin/org/zowe/jcl/lang/Jcl.flex'
+    def targetDir = 'src/main/java/org/zowe/jcl/lang'
     def encoding = 'UTF-8'
     classpath = files(jflexJar)
     args('-d', targetDir, '--encoding', encoding, source)
