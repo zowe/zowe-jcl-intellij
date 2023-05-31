@@ -28,8 +28,6 @@ import groovyjarjarantlr.Token;
 %eof{  return;
 %eof}
 %{
-  public int yyline = 0;
-  public int yycolumn = 0;
   public int prevState = 0;
   public IElementType prevType = null;
   public boolean movedBack = false;
