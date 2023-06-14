@@ -1,0 +1,64 @@
+<templateSet group="JCL">
+    <template
+            name="IEFBR14 (Step)"
+            value="$STEPNAME$ EXEC PGM=IEFBR14"
+            description="Job: Step to execute IEFBR14"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IDCAMS Define VSAM Cluster"
+            value="$STEPNAME$ EXEC PGM=IDCAMS&#10;//SYSPRINT DD   SYSOUT=*&#10;//SYSIN    DD   *&#10; DEFINE    CLUSTER  (NAME($MASK$.VSAM)                 -&#10;                    TRACKS(10 1)                              -&#10;                    RECORDSIZE(2964 2964)                     -&#10;                    FREESPACE(10 15)                          -&#10;                    KEYS(6 0)                                 -&#10;                    INDEXED)                                  -&#10;           DATA     (NAME($MASK$.DATA)                 -&#10;                    CISZ(8192))                               -&#10;           INDEX    (NAME($MASK$.INDEX))&#10;/*&#10;//"
+            description="Job: IDCAMS Utility - define VSAM Cluster"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="MASK" defaultValue="&quot;HLQ.DSN1&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IDCAMS-Cluster"
+            value="$STEPNAME$ EXEC PGM=IDCAMS&#10;//SYSPRINT    DD SYSOUT=*&#10;//SYSUDUMP    DD SYSOUT=*&#10;//AMSDUMP     DD SYSOUT=*&#10;//SYSIN       DD *&#10; DEFINE CLUSTER (NAME($CLUSTERNAME$) -&#10; $CLUSTERDATATYPE$ - &#10; $SPACEUNITS$($SPACEAMOUNT$) - &#10; )&#10;/*"
+            description="Job: IDCAMS Utility - define Cluster"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="CLUSTERNAME" defaultValue="&quot;YOUR.NEW.CLUSTER&quot;" alwaysStopAt="true"/>
+        <variable name="CLUSTERDATATYPE" expression="enum(&quot;INDEXED&quot;,&quot;LINEAR&quot;,&quot;NONINDEXED&quot;,&quot;NUMBERED&quot;)" defaultValue="&quot;INDEXED&quot;" alwaysStopAt="true"/>
+        <variable name="SPACEUNITS" expression="enum(&quot;CYLINDERS&quot;,&quot;MEGABYTES&quot;,&quot;TRACKS&quot;)" defaultValue="CYLINDERS" alwaysStopAt="true"/>
+        <variable name="SPACEAMOUNT" defaultValue="&quot;p s&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true" />
+        </context>
+    </template>
+    <template
+            name="BPXBATCH-SU"
+            value="$STEPNAME$ EXEC PGM=BPXBATCH,&#10;// PARM='SH echo $COMMAND$ | su'&#10;//STDOUT DD SYSOUT=*&#10;//STDERR DD SYSOUT=*&#10;"
+            description="Job: BPXBATCH SH with su"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="COMMAND" defaultValue="&quot;your command&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="EXEC"
+            value="$STEPNAME$ EXEC $PARAMS$"
+            description="Job: EXEC card."
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="PARAMS" defaultValue="&quot;PGM=IEFBR14&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+</templateSet>

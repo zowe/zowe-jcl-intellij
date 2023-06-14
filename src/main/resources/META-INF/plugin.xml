@@ -41,6 +41,9 @@ Zowe™ JCL Features plug-in that brings support for JCL language in IntelliJ ID
 
         <completion.contributor language="JCL" implementationClass="org.zowe.jcl.lang.JclCompletionContributor"/>
 
+        <defaultLiveTemplates file="jcl_templates_definition.xml"/>
+        <liveTemplateContext implementation="org.zowe.jcl.lang.templates.JobTemplateContext"/>
+
     </extensions>
 
     <actions>
