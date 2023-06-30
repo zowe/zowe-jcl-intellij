@@ -9,14 +9,14 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-    id 'org.jetbrains.intellij' version '1.11.0'
-    id 'java'
-    id 'org.jetbrains.grammarkit' version '2021.2.2'
+    kotlin("jvm") version "1.6.21"
+    id("org.jetbrains.intellij") version "1.11.0"
+    java
+    id("org.jetbrains.grammarkit") version "2021.2.2"
 }
 
-group 'org.zowe'
-version '0.2.0-221'
+group = "org.zowe"
+version = "0.2.0-221"
 
 repositories {
     mavenCentral()
@@ -28,20 +28,22 @@ java {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = '2022.1'
+    version.set("2022.1")
 }
 
-patchPluginXml {
-    sinceBuild.set("221.5080")
-    untilBuild.set("222.*")
-    changeNotes.set("""
+tasks {
+    patchPluginXml {
+        sinceBuild.set("221.5080")
+        untilBuild.set("222.*")
+        changeNotes.set(
+            """
       <b>New features:</b>
       <ul>
         <li>Empty string as a parameter value</li>
@@ -84,14 +86,16 @@ patchPluginXml {
         <li>'No such operator' for COMMAND</li>
         <li>String cannot be continued on the next line</li>
       </ul>
-    """)
-}
+    """
+        )
+    }
 
-test {
-    // useJUnitPlatform()
-    // see https://youtrack.jetbrains.com/issue/IDEA-278926
-    scanForTestClasses false
-    include "**/*Test*"
+    test {
+        // useJUnitPlatform()
+        // see https://youtrack.jetbrains.com/issue/IDEA-278926
+        isScanForTestClasses = false
+        include("**/*Test*")
+    }
 }
 
 sourceSets {
@@ -105,45 +109,49 @@ sourceSets {
     }
 }
 
-def jflexVersion = '1.9.1'
+val jflexVersion = "1.9.1"
 
 grammarKit {
     // version of IntelliJ patched JFlex - https://github.com/JetBrains/intellij-deps-jflex
-    jflexRelease = jflexVersion
+    jflexRelease.set(jflexVersion)
     // release version of Grammar-Kit - https://github.com/JetBrains/Grammar-Kit
-    grammarKitRelease = System.getenv().getOrDefault('GRAMMAR_KIT_VERSION', '2021.1.2')
+    grammarKitRelease.set("2021.1.2")
 }
 
-generateParser {
-    source = 'src/main/kotlin/org/zowe/jcl/lang/Jcl.bnf'
-    targetRoot = 'src/main/java'
-    pathToParser = '/org/zowe/jcl/lang/parser/JclParser.java'
-    pathToPsiRoot = '/org/zowe/jcl/lang/psi'
-    purgeOldFiles = true
-}
+tasks {
+    generateParser {
+        source.set("src/main/kotlin/org/zowe/jcl/lang/Jcl.bnf")
+        targetRoot.set("src/main/java")
+        pathToParser.set("/org/zowe/jcl/lang/parser/JclParser.java")
+        pathToPsiRoot.set("/org/zowe/jcl/lang/psi")
+        purgeOldFiles.set(true)
+    }
 
-generateLexer {
-    source = 'src/main/kotlin/org/zowe/jcl/lang/Jcl.flex'
-    targetDir = 'src/main/java/org/zowe/jcl/lang'
-    targetClass = 'JclLexer'
-    purgeOldFiles = true
+    generateLexer {
+        source.set("src/main/kotlin/org/zowe/jcl/lang/Jcl.flex")
+        targetDir.set("src/main/java/org/zowe/jcl/lang")
+        targetClass.set("JclLexer")
+        purgeOldFiles.set(true)
+    }
 }
 
 // needed until it becomes possible to set encoding of .flex file using the generateLexer task
 // see https://github.com/JetBrains/gradle-grammar-kit-plugin/issues/127
-tasks.register('generateJclLexer', JavaExec) {
-    def jflexJar = "jflex-${jflexVersion}.jar"
-    def source = 'src/main/kotlin/org/zowe/jcl/lang/Jcl.flex'
-    def targetDir = 'src/main/java/org/zowe/jcl/lang'
-    def encoding = 'UTF-8'
+val generateJclLexer = task<JavaExec>("generateJclLexer") {
+    val jflexJar = "jflex-${jflexVersion}.jar"
+    val source = "src/main/kotlin/org/zowe/jcl/lang/Jcl.flex"
+    val targetDir = "src/main/java/org/zowe/jcl/lang"
+    val encoding = "UTF-8"
     classpath = files(jflexJar)
-    args('-d', targetDir, '--encoding', encoding, source)
+    args("-d", targetDir, "--encoding", encoding, source)
 }
 
-compileKotlin {
-    dependsOn(generateJclLexer, generateParser)
+tasks {
+    compileKotlin {
+        dependsOn(generateJclLexer, generateParser)
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_11.toString()
+        }
     }
 }
