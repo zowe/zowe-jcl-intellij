@@ -151,6 +151,7 @@
             toReformat="false"
             toShortenFQNames="true">
         <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="MASK" defaultValue="&quot;HLQ.TEST.PDS(member)&quot;" alwaysStopAt="true"/>
         <variable name="FIELD1" defaultValue="&quot;!FIELD1!&quot;" alwaysStopAt="true"/>
         <variable name="FIELD2" defaultValue="&quot;!FIELD2!&quot;" alwaysStopAt="true"/>
         <variable name="FIELD3" defaultValue="&quot;!FIELD3!&quot;" alwaysStopAt="true"/>
