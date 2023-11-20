@@ -39,7 +39,7 @@ intellij {
     //type = 'IC'
 
     // To have a dependency on zowe explorer from the marketplace
-    plugins = ['org.zowe.explorer:1.0.0']
+    plugins = ['org.zowe.explorer:1.1.0-231']
 
     // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
     //plugins = ["${projectDir}\\libs\\for-mainframe"]
@@ -51,12 +51,13 @@ patchPluginXml {
     changeNotes.set("""
       <b>New features:</b>
       <ul>
-        <li>None at the moment</li>
+        <li>Updated Zowe Explorer version</li>
+        <li>Added support for IntelliJ v2023.2</li>
       </ul>
       <br>
       <b>Fixed bugs:</b>
       <ul>
-        <li>Added support for IntelliJ v2023.2</li>
+        <li>None at the moment</li>
       </ul>
     """)
 }
