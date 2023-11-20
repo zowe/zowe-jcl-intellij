@@ -47,7 +47,7 @@ intellij {
 
 patchPluginXml {
     sinceBuild.set("223.5080")
-    untilBuild.set("231.*")
+    untilBuild.set("223.*")
     changeNotes.set("""
       <b>New features:</b>
       <ul>
