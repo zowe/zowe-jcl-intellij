@@ -16,7 +16,7 @@ plugins {
 }
 
 group 'org.zowe'
-version '0.1.0-223'
+version '0.1.1-231'
 
 repositories {
     mavenCentral()
@@ -51,7 +51,8 @@ patchPluginXml {
     changeNotes.set("""
       <b>New features:</b>
       <ul>
-        <li>Updated Zowe Explorer version</li>
+        <li>Separated the plugin to three versions</li>
+        <li>Zowe Explorer version update</li>
         <li>Added support for IntelliJ v2023.2</li>
       </ul>
       <br>
