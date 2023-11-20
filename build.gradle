@@ -16,7 +16,7 @@ plugins {
 }
 
 group 'org.zowe'
-version '0.1.0-223'
+version '0.1.1-223'
 
 repositories {
     mavenCentral()
@@ -51,7 +51,8 @@ patchPluginXml {
     changeNotes.set("""
       <b>New features:</b>
       <ul>
-        <li>Separated the plugin to three versionsNone at the moment</li>
+        <li>Separated the plugin to three versions</li>
+        <li>Zowe Explorer version update</li>
       </ul>
       <br>
       <b>Fixed bugs:</b>
