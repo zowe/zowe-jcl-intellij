@@ -10,7 +10,7 @@
 
 <idea-plugin>
     <id>org.zowe.jcl</id>
-    <name>Zowe™ JCL Plug-In</name>
+    <name>Zowe™ JCL</name>
     <vendor email="zowe.robot@gmail.com" url="https://zowe.org">Zowe</vendor>
 
     <description><![CDATA[
