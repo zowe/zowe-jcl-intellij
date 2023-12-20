@@ -54,6 +54,7 @@ tasks {
       <ul>
         <li>Separated the plugin to three versions</li>
         <li>Zowe Explorer version update</li>
+        <li>Added support for IntelliJ v2023.2</li>
       </ul>
       <br>
       <b>Fixed bugs:</b>

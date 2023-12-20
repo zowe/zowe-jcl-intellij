@@ -5,6 +5,7 @@ All notable changes to the Zowe™ JCL plug-in for IntelliJ IDEA™ will be docu
 ## `0.1.1 (2023-11-20)`
 * Feature: Separated the plugin to three versions
 * Feature: Zowe Explorer version update
+* Feature: Added support for IntelliJ v2023.2
 
 
 ## `0.1.0 (2023-05-29)`
