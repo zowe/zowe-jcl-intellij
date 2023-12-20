@@ -36,6 +36,12 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version.set("2022.1")
+
+    // To have a dependency on zowe explorer from the marketplace
+    plugins.set(listOf("org.zowe.explorer:1.1.1-221"))
+
+    // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
+    // plugins.set(listOf("${projectDir}\\libs\\for-mainframe"))
 }
 
 tasks {
