@@ -1,0 +1,239 @@
+<templateSet group="JCL">
+    <template
+            name="IEFBR14 (Step)"
+            value="$STEPNAME$ EXEC PGM=IEFBR14"
+            description="Job: Step to execute IEFBR14"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IDCAMS Define VSAM Cluster"
+            value="$STEPNAME$ EXEC PGM=IDCAMS&#10;//SYSPRINT DD   SYSOUT=*&#10;//SYSIN    DD   *&#10; DEFINE    CLUSTER  (NAME($MASK$.VSAM)                 -&#10;                    TRACKS(10 1)                              -&#10;                    RECORDSIZE(2964 2964)                     -&#10;                    FREESPACE(10 15)                          -&#10;                    KEYS(6 0)                                 -&#10;                    INDEXED)                                  -&#10;           DATA     (NAME($MASK$.DATA)                 -&#10;                    CISZ(8192))                               -&#10;           INDEX    (NAME($MASK$.INDEX))&#10;/*&#10;//"
+            description="Job: IDCAMS Utility - define VSAM Cluster"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="MASK" defaultValue="&quot;HLQ.DSN1&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IDCAMS-Cluster"
+            value="$STEPNAME$ EXEC PGM=IDCAMS&#10;//SYSPRINT    DD SYSOUT=*&#10;//SYSUDUMP    DD SYSOUT=*&#10;//AMSDUMP     DD SYSOUT=*&#10;//SYSIN       DD *&#10; DEFINE CLUSTER (NAME($CLUSTERNAME$) -&#10; $CLUSTERDATATYPE$ - &#10; $SPACEUNITS$($SPACEAMOUNT$) - &#10; )&#10;/*"
+            description="Job: IDCAMS Utility - define Cluster"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="CLUSTERNAME" defaultValue="&quot;YOUR.NEW.CLUSTER&quot;" alwaysStopAt="true"/>
+        <variable name="CLUSTERDATATYPE" expression="enum(&quot;INDEXED&quot;,&quot;LINEAR&quot;,&quot;NONINDEXED&quot;,&quot;NUMBERED&quot;)" defaultValue="&quot;INDEXED&quot;" alwaysStopAt="true"/>
+        <variable name="SPACEUNITS" expression="enum(&quot;CYLINDERS&quot;,&quot;MEGABYTES&quot;,&quot;TRACKS&quot;)" defaultValue="CYLINDERS" alwaysStopAt="true"/>
+        <variable name="SPACEAMOUNT" defaultValue="&quot;p s&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true" />
+        </context>
+    </template>
+    <template
+            name="BPXBATCH-SU"
+            value="$STEPNAME$ EXEC PGM=BPXBATCH,&#10;// PARM='SH echo $COMMAND$ | su'&#10;//STDOUT DD SYSOUT=*&#10;//STDERR DD SYSOUT=*&#10;"
+            description="Job: BPXBATCH SH with su"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="COMMAND" defaultValue="&quot;your command&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="EXEC"
+            value="$STEPNAME$ EXEC $PARAMS$"
+            description="Job: EXEC card."
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="PARAMS" defaultValue="&quot;PGM=IEFBR14&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="FTP"
+            value="$STEPNAME$ EXEC PGM=FTP,PARM=$PARAMS$&#10;//NETRC    DD DISP=SHR,DSN=$MASK1$&#10;//* NETRC points to a record of specific format to login to an LPAR&#10;//SYSUT2   DD DISP=SHR,DSN=$MASK2$&#10;//INPUT    DD *&#10;site rdw&#10;GET $FILE$ //DD:SYSUT2&#10;quit&#10;/*&#10;//&#10;//*  GET &lt;FromHost File&gt;  //DD: &lt;ToHost Dataset&gt;&#10;//*  inetcat changes (and prefix inetcat... odd)&#10;cd inetcat&#10;structure record&#10;binary"
+            description="FTP"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="PARAMS" defaultValue="&quot;!xxx.xx.xx.xx (EXIT)!&quot;" alwaysStopAt="true"/>
+        <variable name="MASK1" defaultValue="&quot;HLQ.DSN1&quot;" alwaysStopAt="true"/>
+        <variable name="MASK2" defaultValue="&quot;HLQ.DSN2&quot;" alwaysStopAt="true"/>
+        <variable name="FILE" defaultValue="&quot;TEST.VB&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBCOMPR"
+            value="$STEPNAME$ EXEC PGM=IEBCOMPR&#10;//SYSPRINT DD  SYSOUT=A&#10;//SYSUT1   DD  DSNAME=$MASK1$,DISP=SHR&#10;//SYSUT2   DD  DSNAME=$MASK2$,DISP=SHR&#10;//SYSIN    DD  *&#10;      COMPARE  TYPORG=$TYPORG$&#10;/*&#10;//"
+            description="IEBCOMPR"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="MASK1" defaultValue="&quot;HLQ.DSN1&quot;" alwaysStopAt="true"/>
+        <variable name="MASK2" defaultValue="&quot;HLQ.DSN2&quot;" alwaysStopAt="true"/>
+        <variable name="TYPORG" expression="enum(&quot;PS&quot;,&quot;PO&quot;)" defaultValue="&quot;PO&quot;)" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBCOPY"
+            value="$STEPNAME$  EXEC PGM=IEBCOPY&#10;//SYSPRINT  DD SYSOUT=*&#10;//$INPUTDD$      DD DISP=SHR,DSN=$INDSN$&#10;//$OUTPUTDD$     DD DISP=SHR,DSN=$OUTDSN$&#10;//SYSIN     DD *&#10; COPY OUTDD=$INPUTDD$,INDD=$OUTPUTDD$ &#10;/*&#10;"
+            description="IEBCOPY Utility"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="INPUTDD" defaultValue="&quot;INDD&quot;" alwaysStopAt="true"/>
+        <variable name="INDSN" defaultValue="&quot;IN.DSN&quot;" alwaysStopAt="true"/>
+        <variable name="OUTPUTDD" defaultValue="&quot;OUTDD&quot;" alwaysStopAt="true"/>
+        <variable name="OUTDSN" defaultValue="&quot;OUT.DSN&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBCOPY (From a Library to an existing PDS)"
+            value="$STEPNAME$ EXEC PGM=IEBCOPY&#10;//SYSPRINT DD SYSOUT=*&#10;//SYSIN    DD DUMMY&#10;//SYSUT2   DD DISP=SHR,DSN=$LIBRARY$&#10;//SYSUT1   DD DISP=SHR,DSN=$PDS$"
+            description="IEBCOPY (From a Library to an existing PDS)"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="LIBRARY" defaultValue="&quot;HLQ.LIBRARY&quot;" alwaysStopAt="true"/>
+        <variable name="PDS" defaultValue="&quot;HLQ.EXIST.PDS&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBCOPY (From an existing library to a new PDS)"
+            value="$STEPNAME$ EXEC PGM=IEBCOPY&#10;//SYSPRINT DD SYSOUT=*&#10;//SYSIN    DD DUMMY&#10;//SYSUT1   DD DISP=SHR,DSN=$LIBRARY$&#10;//SYSUT2   DD DISP=(NEW,CATLG,DELETE),DSN=$PDS$,&#10;//   LIKE=$LIBRARY$"
+            description="IEBCOPY (From an existing library to a new PDS)"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="LIBRARY" defaultValue="&quot;HLQ.LIBRARY&quot;" alwaysStopAt="true"/>
+        <variable name="PDS" defaultValue="&quot;HLQ.NEW.PDS&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBCOPY (VSAM to QSAM)"
+            value="$STEPNAME$ EXEC PGM=IDCAMS&#10;//SYSPRINT DD SYSOUT=A&#10;//VSAM DD DSN=$VSAM$,DISP=OLD&#10;//SEQ  DD DSN=$QSAM$,UNIT=SYSDA,&#10;//     SPACE=(TRK,(10,10)),&#10;//     DISP=(NEW,CATLG),&#10;//     DCB=(LRECL=1000,BLKSIZE=1004,RECFM=VB)&#10;//SYSIN DD *&#10;  REPRO -&#10;    INFILE(VSAM) -&#10;    OUTFILE(SEQ)&#10;/*"
+            description="IEBCOPY (VSAM to QSAM)"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="VSAM" defaultValue="&quot;HLQ.VSAM&quot;" alwaysStopAt="true"/>
+        <variable name="QSAM" defaultValue="&quot;HLQ.QSAM&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBDG"
+            value="$STEPNAME$ EXEC PGM=IEBDG&#10;//SYSPRINT DD SYSOUT=*&#10;//OUTFILE  DD DSN=$MASK$,DISP=SHR&#10;//SYSIN    DD *&#10; DSD OUTPUT=(OUTFILE)&#10; FD NAME=$FIELD1$,LENGTH=20,FORMAT=AL,ACTION=RP&#10; FD NAME=$FIELD2$,LENGTH=20,PICTURE=20,'ALEXANDRIA          '&#10; FD NAME=$FIELD3$,LENGTH=20,PICTURE=20,'RIDGEWOOD           '&#10; FD NAME=$FIELD4$,LENGTH=2,PICTURE=2,'NJ'&#10; FD NAME=$FIELD5$,LENGTH=5,PICTURE=5,'06758'&#10; CREATE QUANTITY=100,NAME=($FIELD1$,$FIELD2$,$FIELD3$,$FIELD4$,$FIELD5$),&#10;        FILL=X'40'&#10; END&#10;/*"
+            description="IEBDG"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="MASK" defaultValue="&quot;HLQ.TEST.PDS(member)&quot;" alwaysStopAt="true"/>
+        <variable name="FIELD1" defaultValue="&quot;!FIELD1!&quot;" alwaysStopAt="true"/>
+        <variable name="FIELD2" defaultValue="&quot;!FIELD2!&quot;" alwaysStopAt="true"/>
+        <variable name="FIELD3" defaultValue="&quot;!FIELD3!&quot;" alwaysStopAt="true"/>
+        <variable name="FIELD4" defaultValue="&quot;!FIELD4!&quot;" alwaysStopAt="true"/>
+        <variable name="FIELD5" defaultValue="&quot;!FIELD5!&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBGENER"
+            value="$STEPNAME$ EXEC PGM=IEBGENER,COND=(0,NE)&#10;//SYSPRINT DD SYSOUT=*&#10;//SYSIN  DD DUMMY&#10;//SYSUT1 DD DSN=$MASK1$,DISP=(NEW,CATLG,DELETE),&#10;//          VOL=SER=$VOLSER1$,UNIT=3390,SPACE=(TRK,(1,1),RLSE),&#10;//          DCB=(LRECL=80,BLKSIZE=800,RECFM=FB,DSORG=PS)&#10;//SYSUT2 DD DSN=$MASK2$,DISP=(NEW,CATLG,DELETE),&#10;//          VOL=SER=$VOLSER2$,UNIT=3390,SPACE=(TRK,(1,1),RLSE),&#10;//          DCB=(LRECL=80,BLKSIZE=800,RECFM=FB,DSORG=PS)&#10;//SYSUT3 DD DSN=$MASK3$,DISP=(NEW,CATLG,DELETE),&#10;//          VOL=SER=$VOLSER3$,UNIT=3390,SPACE=(TRK,(1,1),RLSE),&#10;//          DCB=(LRECL=80,BLKSIZE=800,RECFM=FB,DSORG=PS)&#10;//"
+            description="IEBGENER"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="MASK1" defaultValue="&quot;HLQ.DS1&quot;" alwaysStopAt="true"/>
+        <variable name="VOLSER1" defaultValue="&quot;VOLSER1&quot;" alwaysStopAt="true"/>
+        <variable name="MASK2" defaultValue="&quot;HLQ.DS2&quot;" alwaysStopAt="true"/>
+        <variable name="VOLSER2" defaultValue="&quot;VOLSER2&quot;" alwaysStopAt="true"/>
+        <variable name="MASK3" defaultValue="&quot;HLQ.DS3&quot;" alwaysStopAt="true"/>
+        <variable name="VOLSER3" defaultValue="&quot;VOLSER3&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IEBGENER (Job)"
+            value="$STEPNAME$ EXEC PGM=IEBGENER &#10;//SYSPRINT DD SYSOUT=*&#10;//SYSUT1   DD DSN=$INDSN$,DISP=SHR &#10;//SYSUT2   DD DSN=$OUTDSN$,DISP=$OUTDSNDISP$, &#10;//            DCB=.SYSUT1,SPACE=$OUTDSNSPACE$,DSNTYPE=LIBRARY&#10;//SYSIN    DD *&#10;OPTIONS&#10;/*"
+            description="IEBGENER (Job)"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="INDSN" defaultValue="&quot;IN.DSN&quot;" alwaysStopAt="true"/>
+        <variable name="OUTDSN" defaultValue="&quot;OUT.DSN&quot;" alwaysStopAt="true"/>
+        <variable name="OUTDSNDISP" defaultValue="&quot;(NEW,CATLG)&quot;" alwaysStopAt="true"/>
+        <variable name="OUTDSNSPACE" defaultValue="&quot;(TRK,(1,1,10))&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IKJEFT01-MOUNT"
+            value="$STEPNAME$ EXEC PGM=IKJEFT01&#10;//SYSTSPRT DD SYSOUT=*&#10;//SYSTSIN  DD *&#10;  MOUNT +&#10;  FILESYSTEM('$DATASET$') +&#10;  MOUNTPOINT('$MOUNTPOINT$') +&#10;  TYPE(ZFS) +&#10;  MODE(RDWR)&#10;/*&#10;"
+            description="IKJEFT01 Mount zfs"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="DATASET" defaultValue="&quot;YOUR.DATASET&quot;" alwaysStopAt="true"/>
+        <variable name="MOUNTPOINT" defaultValue="&quot;/your/mountpont&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="IOEAGFMT-AGGREGATE"
+            value="$STEPNAME$ EXEC PGM=IOEAGFMT,&#10;// PARM=('-aggregate $DATASET$ -compat')&#10;//SYSPRINT DD SYSOUT=*&#10;//SYSUDUMP DD SYSOUT=*&#10;//CEEDUMP  DD SYSOUT=*&#10;//STDOUT   DD SYSOUT=*&#10;//STDERR   DD SYSOUT=*&#10;"
+            description="IOEAGFMT Aggregate compatibility"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="STEPNAME" defaultValue="&quot;STEPNAME&quot;" alwaysStopAt="true"/>
+        <variable name="DATASET" defaultValue="&quot;YOUR.DATASET&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+    <template
+            name="JOB CARD"
+            value="$JOBNAME$ JOB $ACCT$,'$DESCRIPTION$',MSGCLASS=$MSGCLASS$,CLASS=$CLASS$,&#10;// MSGLEVEL=$MSGLEVEL$,REGION=0M,NOTIFY=$USER$,SYSAFF=$SYSAFF$&#10;//****&#10;//* COMMENTS &#10;//****&#10;//*  &#10;"
+            description="JOB CARD"
+            toReformat="false"
+            toShortenFQNames="true">
+        <variable name="JOBNAME" defaultValue="&quot;JOBNAME&quot;" alwaysStopAt="true"/>
+        <variable name="ACCT" defaultValue="&quot;(#ACCT)&quot;" alwaysStopAt="true"/>
+        <variable name="DESCRIPTION" defaultValue="&quot;DESCRIPTION&quot;" alwaysStopAt="true"/>
+        <variable name="MSGCLASS" defaultValue="&quot;A&quot;" alwaysStopAt="true"/>
+        <variable name="CLASS" defaultValue="&quot;A&quot;" alwaysStopAt="true"/>
+        <variable name="MSGLEVEL" defaultValue="&quot;(1,1)&quot;" alwaysStopAt="true"/>
+        <variable name="USER" defaultValue="&quot;&amp;SYSUID.&quot;" alwaysStopAt="true"/>
+        <variable name="SYSAFF" defaultValue="&quot;ANY&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="JOB_CONTEXT" value="true"/>
+        </context>
+    </template>
+</templateSet>

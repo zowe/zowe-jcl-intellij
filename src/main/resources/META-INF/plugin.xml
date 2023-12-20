@@ -10,7 +10,7 @@
 
 <idea-plugin>
     <id>org.zowe.jcl</id>
-    <name>Zowe™ JCL plug-in</name>
+    <name>Zowe™ JCL</name>
     <vendor email="zowe.robot@gmail.com" url="https://zowe.org">Zowe™</vendor>
 
     <description><![CDATA[
@@ -41,6 +41,9 @@ Zowe™ JCL Features plug-in that brings support for JCL language in IntelliJ ID
         <annotator language="JCL" implementationClass="org.zowe.jcl.lang.JclAnnotator"/>
 
         <completion.contributor language="JCL" implementationClass="org.zowe.jcl.lang.JclCompletionContributor"/>
+
+        <defaultLiveTemplates file="jcl_templates_definition.xml"/>
+        <liveTemplateContext implementation="org.zowe.jcl.lang.templates.JobTemplateContext"/>
 
     </extensions>
 
