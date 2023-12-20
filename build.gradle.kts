@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "org.zowe"
-version = "0.2.0-223"
+version = "0.2.0-231"
 
 repositories {
     mavenCentral()
@@ -35,10 +35,10 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2022.3")
+    version.set("2023.1")
 
     // To have a dependency on zowe explorer from the marketplace
-    plugins.set(listOf("org.zowe.explorer:1.1.1-223"))
+    plugins.set(listOf("org.zowe.explorer:1.1.1-231"))
 
     // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
     // plugins.set(listOf("${projectDir}\\libs\\for-mainframe"))
@@ -46,8 +46,8 @@ intellij {
 
 tasks {
     patchPluginXml {
-        sinceBuild.set("223.5080")
-        untilBuild.set("223.*")
+        sinceBuild.set("231.8109")
+        untilBuild.set("232.*")
         changeNotes.set(
             """
       <b>New features:</b>
