@@ -280,7 +280,6 @@ COMMENT_CONTINUES_LINE=\/\/\ [^\n\r]+
 %state INSTREAM_LINE_CONTINUED
 
 %state WAITING_COMMENT_CONTINUED_LINE
-%state WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED
 
 %state WAITING_SN
 %state WAITING_SN_OR_NEW_LINE
@@ -545,8 +544,6 @@ WAITING_TUPLE_PARAM_DELIM_OR_EQUALS> {TUPLE_END}            { return processTupl
 
 <WAITING_COMMENT_CONTINUED_LINE> {COMMENT_CONTINUES_LINE}   { return jclBegin(WAITING_SN_OR_NEW_LINE, JclTypes.COMMENT); }
 
-<WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED> {COMMENT_CONTINUES_LINE}   { return jclBegin(WAITING_SN_OR_LINE_CONTINUES, JclTypes.COMMENT); }
-
 
 <WAITING_SN> {SEQUENCE_NUMBER}                              { return jclBegin(prevState, JclTypes.SEQUENCE_NUMBERS); }
 
@@ -562,7 +559,7 @@ WAITING_TUPLE_PARAM_DELIM_OR_EQUALS> {TUPLE_END}            { return processTupl
 
 <WAITING_SN_OR_LINE_CONTINUES> {SPACE}+{CRLF}               { return jclBegin(LINE_CONTINUED, TokenType.WHITE_SPACE); }
 
-<WAITING_SN_OR_LINE_CONTINUES> {CRLF}                       { if (canCommentContinue) return jclBegin(WAITING_COMMENT_CONTINUED_WHEN_PARAMS_NOT_ENDED, JclTypes.CRLF); else return jclBegin(LINE_CONTINUED, JclTypes.CRLF); }
+<WAITING_SN_OR_LINE_CONTINUES> {CRLF}                       { return jclBegin(LINE_CONTINUED, JclTypes.CRLF); }
 
 {CRLF}+                                                     {
           if (instreamParamStarted) {
