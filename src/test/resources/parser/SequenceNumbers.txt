@@ -1,4 +1,4 @@
-Jcl File(0,161)
+JCL File(0,161)
   JclNullStatementImpl(NULL_STATEMENT)(0,80)
     PsiElement(line_start)('//')(0,2)
     PsiWhiteSpace('                                                                      ')(2,72)

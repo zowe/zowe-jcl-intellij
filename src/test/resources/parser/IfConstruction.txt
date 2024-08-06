@@ -1,4 +1,4 @@
-Jcl File(0,90)
+JCL File(0,90)
   JclJclLineImpl(JCL_LINE)(0,90)
     JclIfConstrImpl(IF_CONSTR)(0,90)
       PsiElement(line_start)('//')(0,2)

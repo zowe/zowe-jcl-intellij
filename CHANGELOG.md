@@ -2,26 +2,31 @@
 
 All notable changes to the Zowe™ JCL plug-in for IntelliJ IDEA™ will be documented in this file.
 
-## `0.1.2 (2024-07-19)`
+## Unreleased
+
+### Features
 
 * Feature: Added support of the latest IntelliJ IDEA version
 * Feature: Dropped support of the IntelliJ IDEA versions below 2023.1
 
+## [0.1.1] (2023-11-20)
 
-## `0.1.1 (2023-11-20)`
+### Features
 
 * Feature: Separated the plugin to three versions
 * Feature: Zowe Explorer version update
 * Feature: Added support for IntelliJ v2023.2
 
+## [0.1.0] (2023-05-29)
 
-## `0.1.0 (2023-05-29)`
+### Features
 
 * Feature: Empty string as a parameter value ([e6cf5a68](https://github.com/zowe/zowe-jcl-intellij/-/commit/e6cf5a68))
 * Feature: Comments after parameters end ([1c83d57c](https://github.com/zowe/zowe-jcl-intellij/-/commit/1c83d57c))
 * Feature: Lexer tests ([eab3205f](https://github.com/zowe/zowe-jcl-intellij/-/commit/eab3205f))
 * Feature: JCL Highlight init version ([2c82f482](https://github.com/zowe/zowe-jcl-intellij/-/commit/2c82f482))
 
+### Bugfix
 
 * Bugfix: Error if keyword DATA is used in in-stream data declaration ([bcdf053f](https://github.com/zowe/zowe-jcl-intellij/-/commit/bcdf053f))
 * Bugfix: Error for NULL statement ([558ac6dd](https://github.com/zowe/zowe-jcl-intellij/-/commit/558ac6dd))
@@ -54,3 +59,7 @@ All notable changes to the Zowe™ JCL plug-in for IntelliJ IDEA™ will be docu
 * Bugfix: 'No such operator' for SCHEDULE/XMIT ([55b6bc19](https://github.com/zowe/zowe-jcl-intellij/-/commit/55b6bc19))
 * Bugfix: 'No such operator' for COMMAND ([55b6bc19](https://github.com/zowe/zowe-jcl-intellij/-/commit/55b6bc19))
 * Bugfix: String cannot be continued on the next line ([ca67f329](https://github.com/zowe/zowe-jcl-intellij/-/commit/ca67f329))
+
+[0.2.0]: https://github.com/zowe/zowe-jcl-intellij/compare/0.1.1...0.2.0
+[0.1.1]: https://github.com/zowe/zowe-jcl-intellij/compare/0.1.0...0.1.1
+[0.1.0]: https://github.com/zowe/zowe-jcl-intellij/commits/0.1.0

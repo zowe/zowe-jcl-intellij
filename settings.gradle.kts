@@ -5,13 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBA Group 2023
+ * Copyright IBA Group 2020
  */
 
-package org.zowe.jcl.lang
-
-import com.intellij.openapi.util.IconLoader
-
-object JclIcons {
-  public final val FILE = IconLoader.getIcon("icons/jclIcon", this::class.java)
-}
+rootProject.name = "jcl"

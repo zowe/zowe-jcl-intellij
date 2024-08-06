@@ -19,7 +19,7 @@ class JclFileType: LanguageFileType(JclLanguage.INSTANCE) {
     public final val INSTANCE = JclFileType()
   }
 
-  override fun getName(): String = "Jcl File"
+  override fun getName(): String = "JCL File"
 
   override fun getDescription(): String = "Job control language"
 
