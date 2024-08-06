@@ -1,8 +1,15 @@
-# JCL Highlight Plugin Changelog
+# Zowe JCL Support Plugin Changelog
 
 All notable changes to the Zowe™ JCL plug-in for IntelliJ IDEA™ will be documented in this file.
 
+## `0.1.2 (2024-07-19)`
+
+* Feature: Added support of the latest IntelliJ IDEA version
+* Feature: Dropped support of the IntelliJ IDEA versions below 2023.1
+
+
 ## `0.1.1 (2023-11-20)`
+
 * Feature: Separated the plugin to three versions
 * Feature: Zowe Explorer version update
 * Feature: Added support for IntelliJ v2023.2

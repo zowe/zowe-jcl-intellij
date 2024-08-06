@@ -9,14 +9,14 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
-    id 'org.jetbrains.intellij' version '1.13.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
+    id 'org.jetbrains.intellij' version '1.17.2'
     id 'java'
     id 'org.jetbrains.grammarkit' version '2021.2.2'
 }
 
 group 'org.zowe'
-version '0.1.1-231'
+version '0.1.2'
 
 repositories {
     mavenCentral()
@@ -28,7 +28,6 @@ java {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
@@ -39,7 +38,7 @@ intellij {
     //type = 'IC'
 
     // To have a dependency on zowe explorer from the marketplace
-    plugins = ['org.zowe.explorer:1.1.0-231']
+    plugins = ['org.zowe.explorer:1.2.1-231']
 
     // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
     //plugins = ["${projectDir}\\libs\\for-mainframe"]
@@ -47,7 +46,6 @@ intellij {
 
 patchPluginXml {
     sinceBuild.set("231.8109")
-    untilBuild.set("232.*")
     changeNotes.set("""
       <b>New features:</b>
       <ul>
