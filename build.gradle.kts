@@ -126,8 +126,19 @@ tasks {
         purgeOldFiles.set(true)
     }
 
+    // needed until it becomes possible to set encoding of .flex file using the generateLexer task
+    // see https://github.com/JetBrains/gradle-grammar-kit-plugin/issues/127
+    val generateJclLexer = task<JavaExec>("generateJclLexer") {
+        val jflexJar = "jflex-${jflexVersion}.jar"
+        val source = "src/main/kotlin/org/zowe/jcl/lang/Jcl.flex"
+        val targetDir = "src/main/java/org/zowe/jcl/lang"
+        val encoding = "UTF-8"
+        classpath = files(jflexJar)
+        args("-d", targetDir, "--encoding", encoding, source)
+    }
+
     compileKotlin {
-        dependsOn(generateLexer, generateParser)
+        dependsOn(generateJclLexer, generateParser)
 
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_17.toString()
@@ -159,15 +170,4 @@ grammarKit {
     jflexRelease.set(jflexVersion)
     // release version of Grammar-Kit - https://github.com/JetBrains/Grammar-Kit
     grammarKitRelease.set("2021.1.2")
-}
-
-// needed until it becomes possible to set encoding of .flex file using the generateLexer task
-// see https://github.com/JetBrains/gradle-grammar-kit-plugin/issues/127
-val generateJclLexer = task<JavaExec>("generateJclLexer") {
-    val jflexJar = "jflex-${jflexVersion}.jar"
-    val source = "src/main/kotlin/org/zowe/jcl/lang/Jcl.flex"
-    val targetDir = "src/main/java/org/zowe/jcl/lang"
-    val encoding = "UTF-8"
-    classpath = files(jflexJar)
-    args("-d", targetDir, "--encoding", encoding, source)
 }
