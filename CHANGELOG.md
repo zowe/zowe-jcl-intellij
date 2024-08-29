@@ -2,7 +2,7 @@
 
 All notable changes to the Zowe™ JCL plug-in for IntelliJ IDEA™ will be documented in this file.
 
-## Unreleased
+## [0.2.0] (2024-08-29)
 
 ### Features
 
