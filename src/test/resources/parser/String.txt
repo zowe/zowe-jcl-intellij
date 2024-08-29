@@ -1,4 +1,4 @@
-Jcl File(0,97)
+JCL File(0,97)
   JclJclLineImpl(JCL_LINE)(0,97)
     PsiElement(line_start)('//')(0,2)
     JclOperatorFullNameImpl(OPERATOR_FULL_NAME)(2,10)

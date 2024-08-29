@@ -18,5 +18,5 @@ import org.zowe.jcl.lang.JclLanguage
 
 class JclFile(viewProvider: FileViewProvider): PsiFileBase(viewProvider, JclLanguage.INSTANCE) {
   override fun getFileType(): FileType = JclFileType.INSTANCE
-  override fun toString(): String = "Jcl File"
+  override fun toString(): String = "JCL File"
 }
