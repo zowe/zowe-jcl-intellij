@@ -1,1 +1,1 @@
-//SORTOUT  DD SPACE=(CYL,(50,1),RLSE<EOLError descr="tuple_end or tuple_param_delim expected"></EOLError>
+//SORTOUT  DD SPACE=(CYL,(50,1),RLSE<EOLError descr="<tuple param>, param_equals, tuple_end or tuple_param_delim expected"></EOLError>

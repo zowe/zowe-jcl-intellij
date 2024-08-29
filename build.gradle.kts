@@ -14,6 +14,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 fun properties(key: String) = providers.gradleProperty(key)
+fun environment(key: String) = providers.environmentVariable(key)
 fun dateValue(pattern: String): String =
     LocalDate.now(ZoneId.of("Europe/Warsaw")).format(DateTimeFormatter.ofPattern(pattern))
 
@@ -49,7 +50,7 @@ intellij {
     version.set("2023.1")
 
     // To have a dependency on zowe explorer from the marketplace
-    plugins.set(listOf("org.zowe.explorer:1.2.1-231"))
+    plugins.set(listOf("org.zowe.explorer:1.2.2-231"))
 
     // To have a dependency on built-in plugin from \Project_dir\libs\for-mainframe
     // plugins.set(listOf("${projectDir}\\libs\\for-mainframe"))
@@ -83,7 +84,8 @@ tasks {
 
     patchPluginXml {
         version.set("${properties("pluginVersion").get()}-${properties("sinceBuildVersion").get().substringBefore(".")}")
-        sinceBuild.set(properties("sinceBuildVersion").get())
+        sinceBuild = properties("sinceBuildVersion")
+        untilBuild = properties("untilBuildVersion")
 
         val changelog = project.changelog // local variable for configuration cache compatibility
         // Get the latest available change notes from the changelog file
@@ -125,8 +127,19 @@ tasks {
         purgeOldFiles.set(true)
     }
 
+    // needed until it becomes possible to set encoding of .flex file using the generateLexer task
+    // see https://github.com/JetBrains/gradle-grammar-kit-plugin/issues/127
+    val generateJclLexer = task<JavaExec>("generateJclLexer") {
+        val jflexJar = "jflex-${jflexVersion}.jar"
+        val source = "src/main/kotlin/org/zowe/jcl/lang/Jcl.flex"
+        val targetDir = "src/main/java/org/zowe/jcl/lang"
+        val encoding = "UTF-8"
+        classpath = files(jflexJar)
+        args("-d", targetDir, "--encoding", encoding, source)
+    }
+
     compileKotlin {
-        dependsOn(generateLexer, generateParser)
+        dependsOn(generateJclLexer, generateParser)
 
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_17.toString()
@@ -139,6 +152,30 @@ tasks {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_17.toString()
         }
+    }
+
+    signPlugin {
+        certificateChain.set(environment("INTELLIJ_SIGNING_CERTIFICATE_CHAIN").map { it })
+        privateKey.set(environment("INTELLIJ_SIGNING_PRIVATE_KEY").map { it })
+        password.set(environment("INTELLIJ_SIGNING_PRIVATE_KEY_PASSWORD").map { it })
+    }
+
+    publishPlugin {
+        dependsOn("patchChangelog")
+        token.set(environment("ZOWE_INTELLIJ_MARKET_TOKEN").map { it })
+        // The pluginVersion is based on the SemVer (https://semver.org)
+        // Read more: https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
+        channels.set(
+          properties("pluginVersion")
+            .map {
+              listOf(
+                it.substringAfter('-', "")
+                  .substringAfter('-', "")
+                  .substringBefore('.')
+                  .ifEmpty { "stable" }
+              )
+            }
+            .map { it })
     }
 }
 
@@ -158,15 +195,4 @@ grammarKit {
     jflexRelease.set(jflexVersion)
     // release version of Grammar-Kit - https://github.com/JetBrains/Grammar-Kit
     grammarKitRelease.set("2021.1.2")
-}
-
-// needed until it becomes possible to set encoding of .flex file using the generateLexer task
-// see https://github.com/JetBrains/gradle-grammar-kit-plugin/issues/127
-val generateJclLexer = task<JavaExec>("generateJclLexer") {
-    val jflexJar = "jflex-${jflexVersion}.jar"
-    val source = "src/main/kotlin/org/zowe/jcl/lang/Jcl.flex"
-    val targetDir = "src/main/java/org/zowe/jcl/lang"
-    val encoding = "UTF-8"
-    classpath = files(jflexJar)
-    args("-d", targetDir, "--encoding", encoding, source)
 }
