@@ -11,7 +11,7 @@
 <idea-plugin>
     <id>org.zowe.jcl</id>
     <name>Zowe™ JCL Support</name>
-    <vendor email="zowe.robot@gmail.com" url="https://zowe.org">Zowe</vendor>
+    <vendor email="zowe.robot@gmail.com" url="https://zowe.org">zowe-binary-project-a-series-of-lf-projects-llc</vendor>
 
     <description><![CDATA[
 Zowe™ JCL Support plug-in that brings support for JCL language in IntelliJ IDEA™ platform.<br>
