@@ -6,6 +6,12 @@ All notable changes to the Zowe™ JCL plug-in for IntelliJ IDEA™ will be docu
 
 ### Features
 
+### Bugfixes
+
+## [0.2.0] (2024-08-29)
+
+### Features
+
 * Feature: Added support of the latest IntelliJ IDEA version and dropped support of the IntelliJ IDEA versions below 2023.1
 * Feature: Added new live templates ([49cd0562](https://github.com/zowe/zowe-jcl-intellij/-/commit/49cd0562))
 * Feature: Added icon on JCL files ([e6d81257](https://github.com/zowe/zowe-jcl-intellij/-/commit/e6d81257))
