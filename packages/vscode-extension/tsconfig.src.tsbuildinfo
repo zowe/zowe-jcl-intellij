@@ -1,0 +1,1 @@
+{"root":["./src/extension/main.ts","./src/language/job-control-language-document-validator.ts","./src/language/job-control-language-module.ts","./src/language/job-control-language-validator.ts","./src/language/main.ts","./src/parser/jcl-parser.ts","./src/parser/jcl-token-builder.ts"],"errors":true,"version":"5.6.3"}

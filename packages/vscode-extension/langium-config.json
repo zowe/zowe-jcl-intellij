@@ -1,0 +1,12 @@
+{
+    "projectName": "JobControlLanguage",
+    "languages": [{
+        "id": "job-control-language",
+        "grammar": "src/language/job-control-language.langium",
+        "fileExtensions": [".jcl"],
+        "textMate": {
+            "out": "syntaxes/job-control-language.tmLanguage.json"
+        }
+    }],
+    "out": "src/language/generated"
+}

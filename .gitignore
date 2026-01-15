@@ -1,5 +1,9 @@
 .gradle
-.idea
+**/.idea/*
+!**/.idea/copyright/
+!**/.idea/copyright/*
+!**/.idea/runConfigurations/
+!**/.idea/runConfigurations/*
 build
 /libs/
 
@@ -23,4 +27,11 @@ $RECYCLE.BIN/
 .DS_Store
 **/.DS_Store
 
-.vscode/
+**/.vscode/*
+!**/.vscode/extensions.json
+!**/.vscode/launch.json
+!**/.vscode/tasks.json
+node_modules/
+out/
+src/language/generated/
+syntaxes/
